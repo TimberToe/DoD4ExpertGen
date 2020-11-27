@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html lang="se">
+<head>
+
+	<title>Drakar och Demoner 4 Expert Karaktärsgenerator</title>
+	
+	<meta name="author" content="https://github.com/Groshie">
+	<meta name="keywords" content="Drakar och Demoner, Karaktär, Karaktärsblad, Karaktärsgenerator, Generator, Gen">
+	<meta name="description" content="Karaktärsgenerator för husreglad Drakar och Demoner 4 Expert">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8-BOM">	
+	<script src="DoD4E.js"></script> 
+
+	<link rel="stylesheet" href="DoD4E.css">
+
+</head>
+
+<body onload="initGen()">
+
+	<div style="z-index: 3;height: 90%;width: 90%;padding-top: 5px; padding-left: 5px">
+		<h1 style="text-size: 30px">Drakar och Demoner Expert 4<br>- Karaktärsgenerator</h1>
+	</div>
+	
+	<div id="left" class="screenSplit" style="width: 55%;height: 100%;position: relative">
+		<h2>Steg för steg</h2>
+		<ol>
+			<li>Skriv valfritt namn och könstillhörighet</li>
+			<li>Välj ras, ålder och yrke</li>
+			<li>Slå fram grundvärden och välj kolumn</li>
+			<li>Köp färdigheter och utrustning</li>
+		</ol>
+		<h2>Ange grundläggande information</h2>
+		<form id="grundForm">
+			<table>
+				<tr>
+					<th>Namn:</th><td><input name="namn" onchange="setThis(this)"></input></td>
+				</tr>
+				<tr>
+					<th>Kön:</th><td><input name="kön" onchange="setThis(this)"></input></td>
+				</tr>
+				<tr>
+					<th>Ras:</th><td><select name="ras" onchange="setThis(this)" style="width:146px"></select></td>
+				</tr>
+				<tr>
+					<th>Ålder:</th><td><select name="ålder" onchange="setThis(this)" style="width:146px"></select></td>
+				</tr>
+				<tr>
+					<th>Yrke:</th><td><select name="yrke" onchange="setThis(this)" style="width:146px"></select></td>
+				</tr>
+			</table>
+		</form><br>
+		
+		<h2>Slå fram modifierade grundvärden</h2>
+		<button style="background-color: gray" onclick="rollStats()"><p>Rulla tärningar</button><p>
+		<table name="calcedStats" style="">
+			<tr>
+				<th>GE</th><th>Val 1</th><th>Val 2</th><th>Val 3</th>
+			</tr>
+			<tr>
+				<th>STY</th><td stat="STY" name="first"></td><td stat="STY" name="second"></td><td stat="STY" name="third"></td>
+			</tr>
+			<tr>
+				<th>STO</th><td stat="STO" name="first"></td><td stat="STO" name="second"></td><td stat="STO" name="third"></td>
+			</tr>
+			<tr>
+				<th>FYS</th><td stat="FYS" name="first"></td><td stat="FYS" name="second"></td><td stat="FYS" name="third"></td>
+			</tr>
+			<tr>
+				<th>SMI</th><td stat="SMI" name="first"></td><td stat="SMI" name="second"></td><td stat="SMI" name="third"></td>
+			</tr>
+			<tr>
+				<th>INT</th><td stat="INT" name="first"></td><td stat="INT" name="second"></td><td stat="INT" name="third"></td>
+			</tr>
+			<tr>
+				<th>PSY</th><td stat="PSY" name="first"></td><td stat="PSY" name="second"></td><td stat="PSY" name="third"></td>
+			</tr>
+			<tr>
+				<th>KAR</th><td stat="KAR" name="first"></td><td stat="KAR" name="second"></td><td stat="KAR" name="third"></td>
+			</tr>
+				<th><strong>Välj:</strong></th><td><input type="radio" id="first" name="statVal" onclick="setStats(this)"></td><td><input type="radio" id="second" name="statVal" onclick="setStats(this)"></td><td><input type="radio" id="third" name="statVal" onclick="setStats(this)"></td>
+			<tr>
+			</tr>
+		</table>
+		
+		<br>
+		
+		<h2>Köp av färdigheter</h2>
+		<table id="köptabell">
+			<tr>
+				<th>Färdighet</th><th>Övrigt</th>
+			</tr>
+			<tr>
+				<td><select id="färdighetsLista" onchange="setSkillCost()"></select></td>
+				<td><input id="fÖvrigt" style="width:150px"></input></td>
+			</tr>
+		</table>
+		<table id="köptabell2">
+			<tr>
+				<th>Kostnad</th>
+				<th>Från</th>
+				<th>Till</th>
+				<th>BP-Kostnad</th>
+				<th><button onclick="addSkill(true)">Lägg till</button></th>
+			</tr>
+			<tr>
+				<td><input id="kostnad" type="number" min=1 style="width:70px" onchange="calcBPCost()"></input></td>
+				<td><input id="från" type="number" min=0 style="width:50px" onchange="calcBPCost()"></input></td>
+				<td><input id="till" type="number" min=0 style="width:50px" onchange="calcBPCost()"></td>
+				<td id="BPkostnad"></td>
+				<td><button onclick="addSkill(false)">Ta bort</button></td
+			</tr>
+		</table><br>
+		
+		<h2>Köp av utrustning</h2>
+		<p><em>Under utveckling</em>
+
+	</div>
+
+	<div id="right" class="screenSplit" style="width: 45%;height: 100vh;position: fixed;top: 0;right: 0;border: 3px solid white;overflow: auto;">
+		<h1>Karaktärsblad</h1>
+		<h2>Information</h2>
+		<table id="info">
+			<tr>
+				<th>Namn</th><th>Kön</th><th>Ålder</th>
+			</tr>
+			<tr>
+				<td id="namn">Inget</td><td id="kön">Inget</td><td id="ålder">Ej vald</td>
+			</tr>
+			<tr>
+				<th>Ras</th><th>Yrke</th><th>Stånd</th>
+			</tr>
+			<tr>
+				<td id="ras">Ej vald</td><td id="yrke">Ej valt</td><td id="stand">Ej valt</td>
+			</tr>
+		</table>
+		<h2>Grundegenskaper</h2>
+		<table id="stats">
+			<tr>
+				<th>STY</th><th>STO</th><th>FYS</th><th>SMI</th><th>INT</th><th>PSY</th><th>KAR</th>
+			</tr>
+			<tr>
+				<td id="STY"></td><td id="STO"></td><td id="FYS"></td><td id="SMI"></td><td id="INT"></td><td id="PSY"></td><td id="KAR"></td>
+			</tr>
+		</table>
+		<table id="calcedStats">
+			<tr>
+				<th>KP</th><th>SB</th><th>BEP</th><th>Hand</th><th>Längd</th>
+			</tr>
+			<tr>
+				<td id="kp"></td><td id="sb"></td><td id="bep"></td><td id="hand"></td><td id="längd"></td>
+			</tr>
+		</table>
+		<table id="points">
+			<tr>
+				<th>Bakgrundspoäng</th><th>Startkapital</th>
+			</tr>
+			<tr>
+				<td id="bp">Inga</td><td id="kapital">Inget</td>
+			</tr>
+		</table>
+		
+		<h2>Färdigheter</h2>
+		<h3>Grundchanser</h3>
+		<table id="GCtabell">
+			<tr>
+				<th>Färdighet</th><th>Egenskap</th><th>Grundchans</th>
+			</tr>
+			<tr>
+				<td>Bluff</td><td>KAR</td><td id="Bluff" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Dra Vapen</td><td>SMI</td><td id="Dra Vapen" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Finna Dolda Ting</td><td>INT</td><td id="Finna Dolda Ting" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Fiska</td><td>INT</td><td id="Fiska" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Första Hjälpen</td><td>INT</td><td id="Första Hjälpen" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Gömma Sig</td><td>INT</td><td id="Gömma Sig" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Hasardspel</td><td>INT</td><td id="Hasardspel" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Hoppa</td><td>SMI</td><td id="Hoppa" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Ilmarsch</td><td>FYS</td><td id="Ilmarsch" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Jaga</td><td>INT</td><td id="Jaga" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Kanot</td><td>SMI</td><td id="Kanot" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Klättra</td><td>SMI</td><td id="Klättra" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Köra Vagn</td><td>SMI</td><td id="Köra Vagn" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Lyssna</td><td>INT</td><td id="Lyssna" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Orientering</td><td>INT</td><td id="Orientering" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Provsmaka</td><td>INT</td><td id="Provsmaka" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Rida</td><td>SMI</td><td id="Rida" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Skidåkning</td><td>SMI</td><td id="Skidåkning" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Smyga</td><td>SMI</td><td id="Smyga" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Spåra</td><td>INT</td><td id="Spåra" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Upptäcka Fara</td><td>PSY</td><td id="Upptäcka Fara" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Vapenfärdigheter</td><td>SMI</td><td id="Vapenfärdigheter" name="gc"></td>
+			</tr>
+			<tr>
+				<td>Änterhake</td><td>SMI</td><td id="Änterhake" name="gc"></td>
+			</tr>	
+			<tr>
+				<td>Övertala</td><td>KAR</td><td id="Övertala" name="gc"></td>
+			</tr>			
+		</table>
+		<h3>Yrkesfärdigheter</h3>
+		<table style="table-layout: fixed;width: 400px">
+			<tr>
+				<td id="yrkesfärdigheter" style="white-space: normal;word-wrap: break-word;max-width: 400px"></td>
+			</tr>
+		</table>
+		<h3>Köpta färdigheter</h3>
+		<table id="köptaFärdigheter">
+			<tr><th>Inga färdigheter ännu</th></tr>
+		</table>
+		
+		<h2>Utrustning</h2>
+		
+		<table id="vapen">
+			<tr><th>Inga vapen</th></tr>
+		</table>
+		
+		<table id="rustning">
+			<tr><th>Ingen rustning</th></tr>
+		</table>
+		
+		<table id="övrigaSaker">
+			<tr><th>Ingen utrustning</th></tr>
+		</table>
+		
+	</div>
+
+</body>
+
+</html>
