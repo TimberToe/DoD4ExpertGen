@@ -1,0 +1,380 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Drakar och Demoner 2016 Karaktärsgenerator</title>
+	
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script type="text/javascript" src="DoD2016Gen.js"></script>
+	
+	<link rel="stylesheet" href="DoD2016Gen.css">
+	
+	<meta name="author" content="Erik Gisslén">
+</head>
+
+<body onload="initGen()">
+
+	<div class="top" id="header">
+		<h1 class="font-effect-fire-animation">Drakar och Demoner 2016<br>- Karaktärsgenerator</h1>
+	</div>
+	
+	<div class="split" id="left">
+	
+		<h2>Instruktioner</h2>
+		<ol>
+			<li>Välj namn och könstillhörighet</li>
+			<li>Slå fram grundegenskaper</li>
+			<li>Välj folkslag och yrke</li>
+			<li>Köp färdigheter</li>
+			<li>Köp utrustning</li>
+		</ol>
+		<h2>Information</h2>
+		<form id="namnKön">
+		<table>
+			<tr>
+				<th>Namn</th>
+				<td><input name="grundForm" onchange="document.getElementById('namn').innerHTML = this.value;"></input></td>
+			</tr>
+			<tr>
+				<th>Kön</th>
+				<td><input name="grundForm" onchange="document.getElementById('kön').innerHTML = this.value;"></input></td>
+			</tr>
+		</table>
+		</form><br>
+		
+		<h2>Grundegenskaper</h2>
+		<p><em>4T6 per egenskap (minus lägsta tärningen).
+		<br>Värdena modifieras sen efter val av folkslag.</em>
+		
+		<p><button class="font-effect-fire-animation" onclick="rollStats();setFinalStats();setCL()">Rulla om tärningarna</button>
+		
+		<table name="statBlocks" style="float: left;display: inline-block;">
+			<tr>
+				<th>Kolumner</th><th>Ett</th><th>Två</th><th>Tre</th>
+			</tr>
+			<tr>
+				<th>Värde 1</th><td name="first"></td><td name="second"></td><td name="third"></td>
+			</tr>
+			<tr>
+				<th>Värde 2</th><td name="first"></td><td name="second"></td><td name="third"></td>
+			</tr>
+			<tr>
+				<th>Värde 3</th><td name="first"></td><td name="second"></td><td name="third"></td>
+			</tr>
+			<tr>
+				<th>Värde 4</th><td name="first"></td><td name="second"></td><td name="third"></td>
+			</tr>
+			<tr>
+				<th>Värde 5</th><td name="first"></td><td name="second"></td><td name="third"></td>
+			</tr>
+			<tr>
+				<th>Värde 6</th><td name="first"></td><td name="second"></td><td name="third"></td>
+			</tr>
+			<tr>
+				<th>Värde 7</th><td name="first"></td><td name="second"></td><td name="third"></td>
+			</tr>
+			<tr>
+				<th><strong>Välj:</strong></th>
+				<td><input type="radio" id="first" name="statVal" onchange="setFinalStats()" onclick="addStatValues(this)" checked="true"></td>
+				<td><input type="radio" id="second" name="statVal" onchange="setFinalStats()" onclick="addStatValues(this)"></td>
+				<td><input type="radio" id="third" name="statVal" onchange="setFinalStats()" onclick="addStatValues(this)"></td>
+			</tr>
+		</table>
+		
+		<table name="statChoice" style="float: left;display: inline-block;margin-left: 10px">
+			<tr>
+				<th>STY</th>
+				<td><input name="chosenStats" data="STY" style="width: 30px"></input></td>
+				<td><button id=0 onclick="moveStatDown(this)">↓</button></td>
+			</tr>			
+			<tr>
+				<th>FYS</th>
+				<td><input name="chosenStats" style="width: 30px"></input ></td>
+				<td><button id=1 onclick="moveStatUp(this)">↑</button>
+				<button id=1 onclick="moveStatDown(this)">↓</button></td>
+			</tr>
+			<tr>
+				<th>SMI</th>
+				<td><input name="chosenStats" style="width: 30px"></input></td>
+				<td><button id=2 onclick="moveStatUp(this)">↑</button>
+				<button id=2 onclick="moveStatDown(this)">↓</button></td>
+			</tr>
+			<tr>
+				<th>PER</th>
+				<td><input name="chosenStats" style="width: 30px"></input></td>
+				<td><button id=3 onclick="moveStatUp(this)">↑</button>
+				<button id=3 onclick="moveStatDown(this)">↓</button></td>
+			</tr>
+			<tr>
+				<th>PSY</th>
+				<td><input name="chosenStats" style="width: 30px"></input></td>
+				<td><button id=4 onclick="moveStatUp(this)">↑</button>
+				<button id=4 onclick="moveStatDown(this)">↓</button></td>
+			</tr>
+			<tr>
+				<th>INT</th>
+				<td><input name="chosenStats" style="width: 30px"></input></td>
+				<td><button id=5 onclick="moveStatUp(this)">↑</button>
+				<button id=5 onclick="moveStatDown(this)">↓</button></td>
+			</tr>
+			<tr>
+				<th>KAR</th>
+				<td><input name="chosenStats" style="width: 30px"></input></td>
+				<td><button id=6 onclick="moveStatUp(this)">↑</button></td>
+			</tr>
+		</table>
+		
+		<p style="clear: both;"></p><br>
+		<h2>Folkslag och yrke</h2>
+		<p><em>Välj folkslag, yrke, samt erfarenhetsnivå.</em>
+		<table>
+			<tr>
+				<th>Folkslag:</th>
+				<td><select id="folkslagsLista" style="width: 110px" onchange="document.getElementById('folkslag').innerHTML = this.value;setFinalStats()"></select></td>
+			</tr>	
+			<tr>
+				<th>Yrke:</th>
+				<td><select id="yrkesLista" style="width: 110px" onchange="document.getElementById('yrke').innerHTML = this.value;setCL()"></select></td>
+			</tr>
+			<tr>
+				<th>Nivå:</th>
+				<td><select id="nivåLista" style="width: 110px"></select></td>
+			</th>
+		</table>
+		
+		<h2>Färdigheter</h2>
+		<p><em>Karaktärer med erfarenhetsnivå över nybörjare får ytterligare val.</em>
+		
+		<h2>Utrustning</h2>
+		<table>
+			<tr>
+				<th>Startkapital: </th><td id="startKapital"></td><td>silver</td>
+			</tr>
+		</table>
+		
+	</div>
+	
+	<div class="split right" id="right">
+		<h2>Karaktärsblad</h2>
+		<h3>Grundinformation</h3>
+		<table id="info">
+			<tr>
+				<th>Namn</th><th>Kön</th><th>Nivå</th>
+			</tr>
+			<tr>
+				<td id="namn">Inget</td><td id="kön">Inget</td><td id="nivå">Ej vald</td>
+			</tr>
+			<tr>
+				<th>Folkslag</th><th>Yrke</th><th>Stånd</th>
+			</tr>
+			<tr>
+				<td id="folkslag">Ej vald</td><td id="yrke">Ej valt</td><td id="stand">Ej valt</td>
+			</tr>
+		</table>
+		<h3>Grundegenskaper</h3>
+		<table id="grundEgenskaper">
+			<tr>
+				<th>STY</th><th>FYS</th><th>SMI</th><th>PER</th><th>PSY</th><th>INT</th><th>KAR</th>
+			</tr>
+			<tr>
+				<td name="finalStats" id="STY"></td>
+				<td name="finalStats" id="FYS"></td>
+				<td name="finalStats" id="SMI"></td>
+				<td name="finalStats" id="PER"></td>
+				<td name="finalStats" id="PSY"></td>
+				<td name="finalStats" id="INT"></td>
+				<td name="finalStats" id="KAR"></td>
+			</tr>
+		</table><br>
+		
+		<h3>Sekundära egenskaper</h3>
+		<table id="secondaryList">
+			<tr>
+				<th>Egenskap</th>
+				<th>Värde</th>
+			</tr>
+			<tr>
+				<th>Kroppspoäng</th>
+				<td name="secondary" id="KP"></td>
+			</tr>
+			<tr>
+				<th>Bärförmåga</th>
+				<td name="secondary" id="Bärförmåga"></td>
+			</tr>
+			<tr>
+				<th>Skadebonus</th>
+				<td name="secondary" id="Skadebonus"></td>
+			</tr>
+			<tr>
+				<th>Förflyttning</th>
+				<td name="secondary" id="Förflyttning"></td>
+			</tr>
+			<tr>
+				<th>Forcera/Retirera</th>
+				<td name="secondary" id="Forcera"></td>
+			</tr>
+			<tr>
+				<th>Behövd vila</th>
+				<td name="secondary" id="Vila"></td>
+			</tr>
+			<tr>
+				<th>Naturlig läkning</th>
+				<td name="secondary" id="Läkning"></td>
+			</tr>
+			<tr>
+				<th>Offensiv hand</th>
+				<td name="secondary" id="Hand"></td>
+			</tr>
+		</table>
+		
+		<h3>Färdigheter</h3>
+		<table id="finalSkillTable">
+		<tr>
+			<th>Färdighet</th>
+			<th>Spec/Övrigt</th>
+			<th>CL</th>
+		</tr>
+		<tr>
+			<td>Besvärjelsekonst</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Besvärjelsekonst"></td>
+		</tr>
+		<tr>
+			<td>Dyrka</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Dyrka"></td>
+		</tr>
+		<tr>
+			<td>Finna dolda ting</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Finna dolda ting"></td>
+		</tr>
+		<tr>
+			<td>Flora och fauna</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Flora och fauna"></td>
+		</tr>
+		<tr>
+			<td>Förhandla</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Förhandla"></td>
+		</tr>
+		<tr>
+			<td>Första hjälpen</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Första hjälpen"></td>
+		</tr>
+		<tr>
+			<td>Geografi</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Geografi"></td>
+		</tr>
+		<tr>
+			<td>Hantverk</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Hantverk"></td>
+		</tr>
+		<tr>
+			<td>Historia</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Historia"></td>
+		</tr>
+		<tr>
+			<td>Jakt och fällor</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Jakt och fällor"></td>
+		</tr>
+		<tr>
+			<td>Kulturer</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Kulturer"></td>
+		</tr>
+		<tr>
+			<td>Läsa och skriva</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Läsa och skriva"></td>
+		</tr>
+		<tr>
+			<td>Orientera</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Orientera"></td>
+		</tr>
+		<tr>
+			<td>Riddjur</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Riddjur"></td>
+		</tr>
+		<tr>
+			<td>Rörlighet</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Rörlighet"></td>
+		</tr>
+		<tr>
+			<td>Simma</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Simma"></td>
+		</tr>
+		<tr>
+			<td>Sjökunnighet</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Sjökunnighet"></td>
+		</tr>
+		<tr>
+			<td>Spel</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Spel"></td>
+		</tr>
+		<tr>
+			<td>Språk (modersmål)</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Språk (modersmål)"></td>
+		</tr>
+		<tr>
+			<td>Spåra</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Spåra"></td>
+		</tr>
+		<tr>
+			<td>Strid (avstånd)</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Strid (avstånd)"></td>
+		</tr>
+		<tr>
+			<td>Strid (närstrid)</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Strid (närstrid)"></td>
+		</tr>
+		<tr>
+			<td>Strid (obeväpnad)</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Strid (obeväpnad)"></td>
+		</tr>
+		<tr>
+			<td>Tjuveri</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Tjuveri"></td>
+		</tr>
+		<tr>
+			<td>Underhålla</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Underhålla"></td>
+		</tr>
+		<tr>
+			<td>Vildmarksliv</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Vildmarksliv"></td>
+		</tr>
+		<tr>
+			<td>Värdesätta</td>
+			<td><input name="specSkills"></input></td>
+			<td name="finalSkills" id="Värdesätta"></td>
+		</tr>
+	</table>
+	
+	<div class="bottom" id="footer">
+		<p><em>Karaktärsgenerator skapad av: Erik Gisslén (2020)<br>Drakar och Demoner tillhör Riotminds. Köp deras spel!</em>
+	</div>
+	
+</body>
+
+</html>
