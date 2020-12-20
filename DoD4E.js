@@ -53,7 +53,7 @@ var races = {
 
 var ages = {
 	"Ung": {"STY": 0, "FYS": 0, "STO": 0, "SMI": 1, "INT": 0, "PSY": 0, "KAR": 0, "Startkapital": 1, "BP": 160},
-	"Mogen": {"STY": 0, "FYS": 0, "STO": 0, "SMI": -1, "INT": 0, "PSY": 1, "KAR": 0, "Startkapital": 1.5, "BP": 220},
+	"Mogen": {"STY": 0, "FYS": 0, "STO": 0, "SMI": 0, "INT": 0, "PSY": 0, "KAR": 0, "Startkapital": 1.5, "BP": 220},
 	"Medelålders": {"STY": -2, "FYS": -1, "STO": 0, "SMI": -1, "INT": 1, "PSY": 1, "KAR": 1, "Startkapital": 2, "BP": 280},
 	"Gammal": {"STY": -3, "FYS": -2, "STO": 0, "SMI": -2, "INT": 0, "PSY": 2, "KAR": 0, "Startkapital": 2.5, "BP": 340}
 };
