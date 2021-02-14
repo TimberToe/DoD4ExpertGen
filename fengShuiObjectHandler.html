@@ -1,0 +1,150 @@
+﻿<!doctype HTML>
+<html>
+<head>
+</head>
+<script>
+/*
+#############################################
+### Lägga till värden i en lista-program! ###
+#############################################
+*/
+/* 
+#############################
+# 1. Variabler				#
+# 2. Objekt					#
+# 3. Funktioner				#
+#############################
+*/
+/*
+################
+# 1. Variabler #
+################
+*/ 
+var entriesString;
+
+/*
+#############
+# 2. Objekt #
+#############
+*/
+var entriesObject = {};
+
+/*
+#################
+# 3. Funktioner #
+#################
+*/
+function init() {
+	// Funktion som körs när sidan laddar
+	console.log("By: Groshie (2021)")
+	return
+}
+
+
+function addToObject(attr, main, sub, cost, time, descr) {
+	// Funktion för att lägga till värden i objektet
+	if (!(entriesObject[attr])) {
+		entriesObject[attr] = {};
+	}
+	if (!(entriesObject[attr][main])) {
+		entriesObject[attr][main] = {};
+	}
+	if (!(entriesObject[attr][main][sub])) {
+		entriesObject[attr][main][sub] = {};
+	}
+	entriesObject[attr][main][sub]["cost"] = cost;
+	entriesObject[attr][main][sub]["time"] = time;
+	entriesObject[attr][main][sub]["descr"] = descr;
+	//console.log(entriesObject);
+	document.getElementById("right").style.display = "block";
+	document.getElementById("rawText").innerHTML = "<p>" + JSON.stringify(entriesObject) + "</p>";
+	let tableText = "";
+	for (attr in entriesObject) {
+		tableText += "<h3>" + attr + "</h3>";
+		for (mainCat in entriesObject[attr]) {
+			tableText += "<p><strong>" + mainCat + "</strong></p>";
+			for (subCat in entriesObject[attr][mainCat]) {
+				tableText += "<p><em>" + subCat + "</em></p>";
+				tableText += "<p><u>Cost:</u> " + entriesObject[attr][mainCat][subCat]["cost"] + ", <u>Time:</u> " + entriesObject[attr][mainCat][subCat]["time"] + "</p>";
+				tableText += "<p><u>Description:</u><br>" + entriesObject[attr][mainCat][subCat]["descr"] + "</p>";
+			}
+		}
+	}
+	document.getElementById("tableText").innerHTML = tableText;
+	return entriesObject
+}
+
+function downloadData(obj) {
+	// Funktion för att ladda ned json i strängformat, txt-fil
+    var dataStr = "data:text/txt;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+    var downloadElement = document.createElement('a');
+    downloadElement.setAttribute("href", dataStr);
+    downloadElement.setAttribute("download", "FengShuiObject.txt");
+    document.body.appendChild(downloadElement); // required for firefox
+    downloadElement.click();
+    downloadElement.remove();
+}
+
+function loadObject() {
+	// Funktion för att ladda objekt från en json i strängformat
+	let loadObject = prompt("Klistra in objektet i textform nedan");
+	entriesObject = JSON.parse(loadObject);
+	document.getElementById("rawText").innerHTML = "<p>" + JSON.stringify(entriesObject) + "</p>";
+	let tableText = "";
+	for (attr in entriesObject) {
+		tableText += "<h3>" + attr + "</h3>";
+		for (mainCat in entriesObject[attr]) {
+			tableText += "<p><strong>" + mainCat + "</strong></p>";
+			for (subCat in entriesObject[attr][mainCat]) {
+				tableText += "<p><em>" + subCat + "</em></p>";
+				tableText += "<p><u>Cost:</u> " + entriesObject[attr][mainCat][subCat]["cost"] + ", <u>Time:</u> " + entriesObject[attr][mainCat][subCat]["time"] + "</p>";
+				tableText += "<p><u>Description:</u><br>" + entriesObject[attr][mainCat][subCat]["descr"] + "</p>";
+			}
+		}
+	}
+	document.getElementById("tableText").innerHTML = tableText;
+	document.getElementById("right").style.display = "block";
+	return entriesObject
+}
+</script>
+
+<style>
+	h1,h2,h3,p {font-family: calibri;color: white}
+	body {background-color: black;margin:20px}
+	.split {float: left;width: 50%}
+	.hidden {display: none}
+</style>
+
+<title>Feng Shui: Object handler</title>
+
+</head>
+<body onload="init()">
+	<h1>Feng Shui | Object Handler</h1>
+	<div id="left" class="split">
+		<h3>Attribut (ex. "Chi")</h3>
+		<input name="adds" id="attr"></input>
+		<h3>Huvudkategori (ex. Skills)</h3>
+		<input name="adds" id="mainCat"></input>
+		<h3>Underkategori (ex. Martial arts)</h3>
+		<input name="adds" id="subCat"></input>
+		<h3>Resurskostnad (ex. 1)</h3>
+		<input name="adds" id="cost"></input>
+		<h3>Tidskostnad/shots (ex. 3)</h3>
+		<input name="adds" id="time"></input>
+		<h3>Beskrivning (ex. "Handlar om...")</h3>
+		<textarea name="adds" id="descr"></textarea>
+		<p><button onclick="addToObject(document.getElementById('attr').value, document.getElementById('mainCat').value, document.getElementById('subCat').value, document.getElementById('cost').value, document.getElementById('time').value, document.getElementById('descr').value)">Lägg till</button>
+		<button onclick="entriesObject={}">Nollställ</button>
+		<button id="downloadButton" onclick="downloadData(entriesObject)">Ladda ned</button></p>
+		<p>Du kan också välja att ladda en fil (.json):</p>
+		<button id="loadObjectButton" onclick="loadObject()">Ladda objekt</button>
+	</div>
+	<div id="right" class="split hidden">
+		<h2>Objekt - Rå text:</h2>
+		<p id="rawText"></p>
+		<h2>Objekt - Strukturerat innehåll:</h2>
+		<div id="tableText"></div>
+	</div>
+</body>
+
+</html>
