@@ -37,6 +37,29 @@ var entriesObject = {};
 function init() {
 	// Funktion som körs när sidan laddar
 	console.log("By: Groshie (2021)")
+	if (!(localStorage.getItem("fengShuiObject"))) {
+		console.log("Inget sparat objekt sedan tidigare, nollställer lista!");
+		entriesObject = {};
+		localStorage.setItem("fengShuiObject", JSON.stringify(entriesObject));
+	} else {
+		console.log("Återställer objekt från senaste sessionen!");
+		entriesObject = JSON.parse(localStorage.getItem("fengShuiObject"))
+		document.getElementById("rawText").innerHTML = "<p>" + JSON.stringify(entriesObject) + "</p>";
+		let tableText = "";
+		for (attr in entriesObject) {
+			tableText += "<h3>" + attr + "</h3>";
+			for (mainCat in entriesObject[attr]) {
+				tableText += "<p><strong>" + mainCat + "</strong></p>";
+				for (subCat in entriesObject[attr][mainCat]) {
+					tableText += "<p><em>" + subCat + "</em></p>";
+					tableText += "<p><u>Cost:</u> " + entriesObject[attr][mainCat][subCat]["cost"] + ", <u>Time:</u> " + entriesObject[attr][mainCat][subCat]["time"] + "</p>";
+					tableText += "<p><u>Description:</u><br>" + entriesObject[attr][mainCat][subCat]["descr"] + "</p>";
+				}
+			}
+		}
+		document.getElementById("tableText").innerHTML = tableText;
+		document.getElementById("right").style.display = "block";
+	}
 	return
 }
 
@@ -58,6 +81,7 @@ function addToObject(attr, main, sub, cost, time, descr) {
 	//console.log(entriesObject);
 	document.getElementById("right").style.display = "block";
 	document.getElementById("rawText").innerHTML = "<p>" + JSON.stringify(entriesObject) + "</p>";
+	localStorage.setItem("fengShuiObject", JSON.stringify(entriesObject));
 	let tableText = "";
 	for (attr in entriesObject) {
 		tableText += "<h3>" + attr + "</h3>";
@@ -90,6 +114,7 @@ function loadObject() {
 	let loadObject = prompt("Klistra in objektet i textform nedan");
 	entriesObject = JSON.parse(loadObject);
 	document.getElementById("rawText").innerHTML = "<p>" + JSON.stringify(entriesObject) + "</p>";
+	localStorage.setItem("fengShuiObject", JSON.stringify(entriesObject));
 	let tableText = "";
 	for (attr in entriesObject) {
 		tableText += "<h3>" + attr + "</h3>";
@@ -136,7 +161,7 @@ function loadObject() {
 		<p><button onclick="addToObject(document.getElementById('attr').value, document.getElementById('mainCat').value, document.getElementById('subCat').value, document.getElementById('cost').value, document.getElementById('time').value, document.getElementById('descr').value)">Lägg till</button>
 		<button onclick="entriesObject={}">Nollställ</button>
 		<button id="downloadButton" onclick="downloadData(entriesObject)">Ladda ned</button></p>
-		<p>Du kan också välja att ladda ett objekt från text (JSON-format):</p>
+		<p>Du kan också ladda ett objekt från en textsträng (JSON-format):</p>
 		<button id="loadObjectButton" onclick="loadObject()">Ladda objekt</button>
 	</div>
 	<div id="right" class="split hidden">
