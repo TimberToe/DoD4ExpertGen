@@ -1,0 +1,97 @@
+﻿<!doctype HTML>
+<html>
+<head>
+<title>Feng Shui Interactive Sheet</title>
+
+<style>
+	body {background-color: black;margin-left: 20px;height: 100%}
+	h1,h2,h3,p,th,td {font-family: calibri;color: white}
+	th {text-align: left}
+	td {text-align: right}
+	.split {float: left;width: 50%;height:100%;overflow-y: scroll;overflow: hidden;box-sizing: border-box;margin-bottom: 100px}
+	.bottom {float: bottom;width: 90%;position: absolute;bottom: 10px;background-color: black;box-sizing: border-box;height: 20%;resize: vertical; overflow: auto}
+</style>
+
+<script>
+function init() {
+	// Funktion som körs när sidan laddar
+	console.log("By: Groshie (2021)")
+	/*
+	if (!(localStorage.getItem("fengShuiObject"))) {
+		console.log("Inget sparat objekt sedan tidigare, nollställer lista!");
+		entriesObject = {};
+		localStorage.setItem("fengShuiObject", JSON.stringify(entriesObject));
+	} else {
+		*/
+		console.log("Återställer objekt från senaste sessionen!");
+		//entriesObject = JSON.parse(localStorage.getItem("fengShuiObject"))
+		entriesObject = prompt("Klistra in textobjektet du vill ladda nedan:")
+		entriesObject = JSON.parse(entriesObject);
+		for (mainCat in entriesObject) {
+			thisHeader = document.createElement("h2");
+			thisHeader.innerHTML = mainCat;
+			thisSelect = document.createElement("select");
+			thisSelect.id = mainCat;
+			for (subCat in entriesObject[mainCat]) {
+				thisOption = document.createElement("option");
+				thisOption.text = subCat;
+				thisSelect.add(thisOption);
+			}
+			document.getElementById("selections").appendChild(thisHeader);
+			document.getElementById("selections").appendChild(thisSelect);
+			thisSelect.onchange = function(){showDescription(mainCat)};
+		}
+	//}
+	return
+}
+
+function showDescription(id) {
+	console.log(document.getElementById(id).value);
+	let descText = "<hr><h2>" + document.getElementById(id).value + "</h2>";
+	descText += "<h3>Attribute: " + entriesObject[document.getElementById(id).id][document.getElementById(id).value]["attr"] + "<br>";
+	descText += "Cost: " + entriesObject[document.getElementById(id).id][document.getElementById(id).value]["cost"] + "<br>";
+	descText += "Time: " + entriesObject[document.getElementById(id).id][document.getElementById(id).value]["time"] + "</h3>";
+	descText += "<h3>Description:</h3>";
+	descText += "<p>" + entriesObject[document.getElementById(id).id][document.getElementById(id).value]["descr"] + "</p>";
+	document.getElementById("descriptions").innerHTML = descText;
+}
+</script>
+</head>
+
+<body onload="init()">
+<h1>Feng Shui Interactive Sheet</h1>
+<hr>
+<div class="split" id="selections">
+</div>
+
+<div class="split" id="sheet">
+	<h2>Character stats</h2>
+	<table id="charStats">
+		<tr><th>Attribute</th><th>Value</th></tr>
+		<tr><th>Bod</th><td><input></input></th></tr>
+		<tr><td>Mov</td><td><input></input></th></tr>
+		<tr><td>Str</td><td><input></input></th></tr>
+		<tr><td>Con</td><td><input></input></th></tr>
+		<tr><td>Tgh</td><td><input></input></th></tr>
+		<tr><th>Chi</th><td><input></input></th></tr>
+		<tr><td>For</td><td><input></input></th></tr>
+		<tr><td>Fu</td><td><input></input></th></tr>
+		<tr><td>Mag</td><td><input></input></th></tr>
+		<tr><th>Mnd</th><td><input></input></th></tr>
+		<tr><td>Cha</td><td><input></input></th></tr>
+		<tr><td>Int</td><td><input></input></th></tr>
+		<tr><td>Per</td><td><input></input></th></tr>
+		<tr><td>Wil</td><td><input></input></th></tr>
+		<tr><th>Ref</th><td><input></input></th></tr>
+		<tr><td>Agl</td><td><input></input></th></tr>
+		<tr><td>Dex</td><td><input></input></th></tr>
+		<tr><td>Spd</td><td><input></input></th></tr>
+	</table>
+</div>
+
+<div class="bottom" id="descriptions">
+<hr>
+</div>
+</body>
+
+</html>
