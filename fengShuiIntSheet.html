@@ -39,14 +39,16 @@ function init() {
 			}
 			document.getElementById("selections").appendChild(thisHeader);
 			document.getElementById("selections").appendChild(thisSelect);
-			thisSelect.onchange = function(){showDescription(mainCat)};
+			thisSelect.onchange = function(){showDescription(this)};
+			thisSelect.onclick = function(){showDescription(this)};
 		}
 	//}
 	return
 }
 
-function showDescription(id) {
-	console.log(document.getElementById(id).value);
+function showDescription(element) {
+	console.log(element.id);
+	id = element.id;
 	let descText = "<hr><h2>" + document.getElementById(id).value + "</h2>";
 	descText += "<h3>Attribute: " + entriesObject[document.getElementById(id).id][document.getElementById(id).value]["attr"] + "<br>";
 	descText += "Cost: " + entriesObject[document.getElementById(id).id][document.getElementById(id).value]["cost"] + "<br>";
