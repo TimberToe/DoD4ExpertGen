@@ -57,6 +57,26 @@ function showDescription(element) {
 	descText += "<p>" + entriesObject[document.getElementById(id).id][document.getElementById(id).value]["descr"] + "</p>";
 	document.getElementById("descriptions").innerHTML = descText;
 }
+
+
+function roll(array) {
+// Slår tärning utifrån värde i lista: [antal, tärning, bonus]
+	var rollSum = 0;
+	for (rolls=0;rolls<array[0];rolls++) {
+		var currentRoll = Math.floor(Math.random() * array[1]) + 1;
+		rollSum += currentRoll;
+	}
+	return rollSum + array[2]
+}
+
+function rollInit() {
+	let dex = document.getElementById("dex").value;
+	if (Number(dex) != dex) {
+		dex = 0;
+	}
+	let initiative = alert("You rolled: " + roll([1, 6, parseInt(dex)]) + "!\n(1D6 + Dex)");
+	return initiative
+}
 </script>
 </head>
 
@@ -70,25 +90,26 @@ function showDescription(element) {
 	<h2>Character stats</h2>
 	<table id="charStats">
 		<tr><th>Attribute</th><th>Value</th></tr>
-		<tr><th>Bod</th><td><input></input></th></tr>
-		<tr><td>Mov</td><td><input></input></th></tr>
-		<tr><td>Str</td><td><input></input></th></tr>
-		<tr><td>Con</td><td><input></input></th></tr>
-		<tr><td>Tgh</td><td><input></input></th></tr>
-		<tr><th>Chi</th><td><input></input></th></tr>
-		<tr><td>For</td><td><input></input></th></tr>
-		<tr><td>Fu</td><td><input></input></th></tr>
-		<tr><td>Mag</td><td><input></input></th></tr>
-		<tr><th>Mnd</th><td><input></input></th></tr>
-		<tr><td>Cha</td><td><input></input></th></tr>
-		<tr><td>Int</td><td><input></input></th></tr>
-		<tr><td>Per</td><td><input></input></th></tr>
-		<tr><td>Wil</td><td><input></input></th></tr>
-		<tr><th>Ref</th><td><input></input></th></tr>
-		<tr><td>Agl</td><td><input></input></th></tr>
-		<tr><td>Dex</td><td><input></input></th></tr>
-		<tr><td>Spd</td><td><input></input></th></tr>
+		<tr><th>Bod</th><td><input id="bod" style="width:25px"></input></th></tr>
+		<tr><td>Mov</td><td><input id="mov" style="width:25px"></input></th></tr>
+		<tr><td>Str</td><td><input id="str" style="width:25px"></input></th></tr>
+		<tr><td>Con</td><td><input id="con" style="width:25px"></input></th></tr>
+		<tr><td>Tgh</td><td><input id="tgh" style="width:25px"></input></th></tr>
+		<tr><th>Chi</th><td><input id="chi" style="width:25px"></input></th></tr>
+		<tr><td>For</td><td><input id="for" style="width:25px"></input></th></tr>
+		<tr><td>Fu</td><td><input id="fu" style="width:25px"></input></th></tr>
+		<tr><td>Mag</td><td><input id="mag" style="width:25px"></input></th></tr>
+		<tr><th>Mnd</th><td><input id="mnd" style="width:25px"></input></th></tr>
+		<tr><td>Cha</td><td><input id="cha" style="width:25px"></input></th></tr>
+		<tr><td>Int</td><td><input id="int" style="width:25px"></input></th></tr>
+		<tr><td>Per</td><td><input id="per" style="width:25px"></input></th></tr>
+		<tr><td>Wil</td><td><input id="wil" style="width:25px"></input></th></tr>
+		<tr><th>Ref</th><td><input id="ref" style="width:25px"></input></th></tr>
+		<tr><td>Agl</td><td><input id="agl" style="width:25px"></input></th></tr>
+		<tr><td>Dex</td><td><input id="dex" style="width:25px"></input></th></tr>
+		<tr><td>Spd</td><td><input id="spd" style="width:25px"></input></th></tr>
 	</table>
+	<button id="initiative" onclick="rollInit()">Roll initiative!</button>
 </div>
 
 <div class="bottom" id="descriptions">
