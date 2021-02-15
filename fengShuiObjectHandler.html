@@ -46,16 +46,14 @@ function init() {
 		entriesObject = JSON.parse(localStorage.getItem("fengShuiObject"))
 		document.getElementById("rawText").innerHTML = "<p>" + JSON.stringify(entriesObject) + "</p>";
 		let tableText = "";
-		for (attr in entriesObject) {
-			tableText += "<h3>" + attr + "</h3>";
-			for (mainCat in entriesObject[attr]) {
-				tableText += "<p><strong>" + mainCat + "</strong></p>";
-				for (subCat in entriesObject[attr][mainCat]) {
-					tableText += "<p><em>" + subCat + "</em></p>";
-					tableText += "<p><u>Cost:</u> " + entriesObject[attr][mainCat][subCat]["cost"] + ", <u>Time:</u> " + entriesObject[attr][mainCat][subCat]["time"] + "</p>";
-					tableText += "<p><u>Description:</u><br>" + entriesObject[attr][mainCat][subCat]["descr"] + "</p>";
-				}
+		for (mainCat in entriesObject) {
+			tableText += "<h3>" + mainCat + "</h3>";
+			for (subCat in entriesObject[mainCat]) {
+				tableText += "<p><em>" + subCat + "</em></p>";
+				tableText += "<p><u>Attribute:</u> " + entriesObject[mainCat][subCat]["attr"] + ", <u>Cost:</u> " + entriesObject[mainCat][subCat]["cost"] + ", <u>Time:</u> " + entriesObject[mainCat][subCat]["time"] + "</p>";
+				tableText += "<p><u>Description:</u><br>" + entriesObject[mainCat][subCat]["descr"] + "</p>";
 			}
+			tableText += "<hr>";
 		}
 		document.getElementById("tableText").innerHTML = tableText;
 		document.getElementById("right").style.display = "block";
@@ -66,33 +64,29 @@ function init() {
 
 function addToObject(attr, main, sub, cost, time, descr) {
 	// Funktion för att lägga till värden i objektet
-	if (!(entriesObject[attr])) {
-		entriesObject[attr] = {};
+	if (!(entriesObject[main])) {
+		entriesObject[main] = {};
 	}
-	if (!(entriesObject[attr][main])) {
-		entriesObject[attr][main] = {};
+	if (!(entriesObject[main][sub])) {
+		entriesObject[main][sub] = {};
 	}
-	if (!(entriesObject[attr][main][sub])) {
-		entriesObject[attr][main][sub] = {};
-	}
-	entriesObject[attr][main][sub]["cost"] = cost;
-	entriesObject[attr][main][sub]["time"] = time;
-	entriesObject[attr][main][sub]["descr"] = descr;
+	entriesObject[main][sub]["attr"] = attr;
+	entriesObject[main][sub]["cost"] = cost;
+	entriesObject[main][sub]["time"] = time;
+	entriesObject[main][sub]["descr"] = descr;
 	//console.log(entriesObject);
 	document.getElementById("right").style.display = "block";
 	document.getElementById("rawText").innerHTML = "<p>" + JSON.stringify(entriesObject) + "</p>";
 	localStorage.setItem("fengShuiObject", JSON.stringify(entriesObject));
 	let tableText = "";
-	for (attr in entriesObject) {
-		tableText += "<h3>" + attr + "</h3>";
-		for (mainCat in entriesObject[attr]) {
-			tableText += "<p><strong>" + mainCat + "</strong></p>";
-			for (subCat in entriesObject[attr][mainCat]) {
-				tableText += "<p><em>" + subCat + "</em></p>";
-				tableText += "<p><u>Cost:</u> " + entriesObject[attr][mainCat][subCat]["cost"] + ", <u>Time:</u> " + entriesObject[attr][mainCat][subCat]["time"] + "</p>";
-				tableText += "<p><u>Description:</u><br>" + entriesObject[attr][mainCat][subCat]["descr"] + "</p>";
-			}
+	for (mainCat in entriesObject) {
+		tableText += "<h3>" + mainCat + "</h3>";
+		for (subCat in entriesObject[mainCat]) {
+			tableText += "<p><em>" + subCat + "</em></p>";
+			tableText += "<p><u>Attribute:</u> " + entriesObject[mainCat][subCat]["attr"] + ", <u>Cost:</u> " + entriesObject[mainCat][subCat]["cost"] + ", <u>Time:</u> " + entriesObject[mainCat][subCat]["time"] + "</p>";
+			tableText += "<p><u>Description:</u><br>" + entriesObject[mainCat][subCat]["descr"] + "</p>";
 		}
+		tableText += "<hr>";
 	}
 	document.getElementById("tableText").innerHTML = tableText;
 	return entriesObject
@@ -111,21 +105,23 @@ function downloadData(obj) {
 
 function loadObject() {
 	// Funktion för att ladda objekt från en json i strängformat
-	let loadObject = prompt("Klistra in objektet i textform nedan");
+	let loadObject = prompt("Klistra in objektet i textform nedan.\nOm det inte visas är JSON-formatet fel.");
 	entriesObject = JSON.parse(loadObject);
+	if (entriesObject !== Object(JSON.parse(loadObject))) {
+		alert("Not valid JSON!");
+		return
+	}
 	document.getElementById("rawText").innerHTML = "<p>" + JSON.stringify(entriesObject) + "</p>";
 	localStorage.setItem("fengShuiObject", JSON.stringify(entriesObject));
 	let tableText = "";
-	for (attr in entriesObject) {
-		tableText += "<h3>" + attr + "</h3>";
-		for (mainCat in entriesObject[attr]) {
-			tableText += "<p><strong>" + mainCat + "</strong></p>";
-			for (subCat in entriesObject[attr][mainCat]) {
-				tableText += "<p><em>" + subCat + "</em></p>";
-				tableText += "<p><u>Cost:</u> " + entriesObject[attr][mainCat][subCat]["cost"] + ", <u>Time:</u> " + entriesObject[attr][mainCat][subCat]["time"] + "</p>";
-				tableText += "<p><u>Description:</u><br>" + entriesObject[attr][mainCat][subCat]["descr"] + "</p>";
-			}
+	for (mainCat in entriesObject) {
+		tableText += "<h3>" + mainCat + "</h3>";
+		for (subCat in entriesObject[mainCat]) {
+			tableText += "<p><em>" + subCat + "</em></p>";
+			tableText += "<p><u>Attribute:</u> " + entriesObject[mainCat][subCat]["attr"] + ", <u>Cost:</u> " + entriesObject[mainCat][subCat]["cost"] + ", <u>Time:</u> " + entriesObject[mainCat][subCat]["time"] + "</p>";
+			tableText += "<p><u>Description:</u><br>" + entriesObject[mainCat][subCat]["descr"] + "</p>";
 		}
+		tableText += "<hr>";
 	}
 	document.getElementById("tableText").innerHTML = tableText;
 	document.getElementById("right").style.display = "block";
@@ -146,13 +142,13 @@ function loadObject() {
 <body onload="init()">
 	<h1>Feng Shui | Object Handler</h1>
 	<div id="left" class="split">
-		<h3>Attribut (ex. "Chi")</h3>
-		<input name="adds" id="attr"></input>
 		<h3>Huvudkategori (ex. Skills)</h3>
 		<input name="adds" id="mainCat"></input>
 		<h3>Underkategori (ex. Martial arts)</h3>
 		<input name="adds" id="subCat"></input>
-		<h3>Resurskostnad (ex. 1)</h3>
+		<h3>Attribut (ex. Agility)</h3>
+		<input name="adds" id="attr"></input>
+		<h3>Resurskostnad (ex. 0)</h3>
 		<input name="adds" id="cost"></input>
 		<h3>Tidskostnad/shots (ex. 3)</h3>
 		<input name="adds" id="time"></input>
