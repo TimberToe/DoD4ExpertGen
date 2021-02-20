@@ -93,6 +93,7 @@ function init() {
 			document.getElementById("selections").appendChild(thisButton);
 		}
 	//}
+	setInitStats();
 	return
 }
 
@@ -171,6 +172,7 @@ function setInitStats() {
 	var tableRows = document.getElementById("charStats").rows;
 	for (row in tableRows) {
 		tableRows.item(row).childNodes.item(1).childNodes.item(0).value = parseInt(fengShuiChar["attr"][tableRows.item(row).childNodes.item(1).childNodes[0].id]);
+		console.log(fengShuiChar["attr"][tableRows.item(row).childNodes.item(1).childNodes[0].id]);
 	}
 	return
 }
