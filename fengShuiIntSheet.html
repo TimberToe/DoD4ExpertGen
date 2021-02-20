@@ -8,46 +8,152 @@
 	h1,h2,h3,p,th,td {font-family: calibri;color: white}
 	th {text-align: left}
 	td {text-align: right}
-	.split {float: left;width: 50%;height:100%;overflow-y: scroll;overflow: hidden;box-sizing: border-box;margin-bottom: 100px}
-	.bottom {float: bottom;width: 90%;position: absolute;bottom: 10px;background-color: black;box-sizing: border-box;height: 20%;resize: vertical; overflow: auto}
+	.split {float: left;width: 50%;height:100%;overflow-y: scroll;overflow: auto;box-sizing: border-box;margin-bottom: 150px}
+	.bottom {width: 100%;position: fixed;bottom: 0px;left: 0px;background-color: black;box-sizing: border-box;height: 20%;resize: vertical; overflow: auto}
 </style>
 
 <script>
 function init() {
 	// Funktion som körs när sidan laddar
 	console.log("By: Groshie (2021)")
+	
+	// Ladda eller skapa karaktärsobjekt
+	if (!(localStorage.getItem("fengShuiChar"))) {
+		console.log("Inget sparat karaktärsobjekt sedan tidigare, nollställer objekt!");
+		fengShuiChar = {
+			"attr": {
+				"bod": 5,
+				"mov": 5,
+				"str": 5,
+				"con": 5,
+				"tgh": 5,
+				"chi": 0,
+				"for": 5,
+				"fu": 5,
+				"mag": 5,
+				"mnd": 5,
+				"cha": 5,
+				"int": 5,
+				"per": 5,
+				"wil": 5,
+				"ref": 5,
+				"agl": 5,
+				"dex": 5,
+				"spd": 5
+			}
+		};
+		localStorage.setItem("fengShuiChar", JSON.stringify(fengShuiChar));
+		console.log(fengShuiChar);
+	} else {
+		console.log("Återställer objekt från senaste sessionen!");
+		fengShuiChar = JSON.parse(localStorage.getItem("fengShuiChar"));
+	}
+	
 	/*
+	// Skapa eller ladda listobjekt
 	if (!(localStorage.getItem("fengShuiObject"))) {
 		console.log("Inget sparat objekt sedan tidigare, nollställer lista!");
 		entriesObject = {};
 		localStorage.setItem("fengShuiObject", JSON.stringify(entriesObject));
 	} else {
-		*/
 		console.log("Återställer objekt från senaste sessionen!");
-		//entriesObject = JSON.parse(localStorage.getItem("fengShuiObject"))
+		entriesObject = JSON.parse(localStorage.getItem("fengShuiObject"))
+		*/
 		entriesObject = prompt("Klistra in textobjektet du vill ladda nedan:")
 		entriesObject = JSON.parse(entriesObject);
 		for (mainCat in entriesObject) {
+			// Skapa rubrik till lista
 			thisHeader = document.createElement("h2");
 			thisHeader.innerHTML = mainCat;
+			
+			// Skapa listobjekt
 			thisSelect = document.createElement("select");
 			thisSelect.id = mainCat;
+			
+			// Lägg till värden i listobjekt
 			for (subCat in entriesObject[mainCat]) {
 				thisOption = document.createElement("option");
 				thisOption.text = subCat;
+				thisOption.style.width = "150px"
 				thisSelect.add(thisOption);
 			}
-			document.getElementById("selections").appendChild(thisHeader);
-			document.getElementById("selections").appendChild(thisSelect);
 			thisSelect.onchange = function(){showDescription(this)};
 			thisSelect.onclick = function(){showDescription(this)};
+			
+			// Lägg till knapp
+			thisButton = document.createElement("button");
+			thisButton.name = mainCat;
+			thisButton.innerHTML = "Add " + mainCat;
+			thisButton.style.width = "100px"
+			thisButton.onclick = function(){addCharSkill(this)};
+			
+			// Lägg till rubrik, listobjekt och knapp på sida i rätt ordning
+			document.getElementById("selections").appendChild(thisHeader);
+			document.getElementById("selections").appendChild(thisSelect);
+			document.getElementById("selections").appendChild(thisButton);
 		}
 	//}
 	return
 }
 
+
+function setCharAttribute(element) {
+	// Funktion för att sätta ett attributvärde
+	id = element.id;
+	value = parseInt(element.value);
+	fengShuiChar.attr[id] = parseInt(value);
+	localStorage.setItem("fengShuiChar", JSON.stringify(fengShuiChar));
+	// console.log(fengShuiChar.attr[id] = value);
+	return fengShuiChar.attr[id]
+}
+
+
+function addCharSkill(element) {
+	// Lägger till kategori och färdighet i respektive lista
+	let category = element.name;
+	let skill = document.getElementById(category).value;
+	if (!(fengShuiChar[category.toLowerCase()])) {
+		fengShuiChar[category.toLowerCase()] = {};
+	}
+	fengShuiChar[category.toLowerCase()][skill] = 0;
+	localStorage.setItem("fengShuiChar", JSON.stringify(fengShuiChar));
+	
+	// Skapa ny tabelltext
+	let tableText = "<tr><th>" + category + "</th><th>Rank</th></tr>";
+	for (skillText in fengShuiChar[category.toLowerCase()]) {
+		tableText += "<tr><th>" + skillText + "</th><th><input onchange='setCharSkill(this)' type='number' id='" + skillText + "' style='width:35px' value=" + fengShuiChar[category.toLowerCase()][skillText] + "></input></th></tr>";
+	}
+	
+	// Skapar ny tabell om rätt tabell inte redan finns
+	if (!(document.getElementById(category.toLowerCase() + "Table"))) {
+		document.getElementById("sheet").innerHTML += "<table id='" + category.toLowerCase() + "Table'></table>";
+	}
+	
+	// Lägger till tabelltexten i rätt tabell
+	document.getElementById(category.toLowerCase() + "Table").innerHTML = tableText;
+	return tableText
+}
+
+
+function setCharSkill(element) {
+	// Sätter färdighetsvärde i karaktärsobjektet EJ KLAR
+	let id = element.id;
+	for (category in fengShuiChar) {
+		for (skill in fengShuiChar[category]) {
+			if (skill.toLowerCase() == id.toLowerCase()) {
+				console.log("fengShuiChar." + category + "." + id);
+				fengShuiChar[category][id] = parseInt(document.getElementById(id).value);
+			}
+		}
+	}
+	localStorage.setItem("fengShuiChar", JSON.stringify(fengShuiChar));
+	console.log(id + " is now " + fengShuiChar[category][id]);
+	return
+}
+
+
 function showDescription(element) {
-	console.log(element.id);
+	// Funktion som visar beskrivning av vad som väljs i listor
 	id = element.id;
 	let descText = "<hr><h2>" + document.getElementById(id).value + "</h2>";
 	descText += "<h3>Attribute: " + entriesObject[document.getElementById(id).id][document.getElementById(id).value]["attr"] + "<br>";
@@ -56,11 +162,22 @@ function showDescription(element) {
 	descText += "<h3>Description:</h3>";
 	descText += "<p>" + entriesObject[document.getElementById(id).id][document.getElementById(id).value]["descr"] + "</p>";
 	document.getElementById("descriptions").innerHTML = descText;
+	return
+}
+
+
+function setInitStats() {
+	// Sätt attribut efter det skapade/laddade karaktärsobjektet
+	var tableRows = document.getElementById("charStats").rows;
+	for (row in tableRows) {
+		tableRows.item(row).childNodes.item(1).childNodes.item(0).value = parseInt(fengShuiChar["attr"][tableRows.item(row).childNodes.item(1).childNodes[0].id]);
+	}
+	return
 }
 
 
 function roll(array) {
-// Slår tärning utifrån värde i lista: [antal, tärning, bonus]
+	// Slår tärning utifrån värde i lista: [antal, tärning, bonus]
 	var rollSum = 0;
 	for (rolls=0;rolls<array[0];rolls++) {
 		var currentRoll = Math.floor(Math.random() * array[1]) + 1;
@@ -69,14 +186,18 @@ function roll(array) {
 	return rollSum + array[2]
 }
 
+
 function rollInit() {
+	// Rullar initiativ utifrån 1D6 + karaktärens dex-värde
 	let dex = document.getElementById("dex").value;
-	if (Number(dex) != dex) {
+	if (Number(dex) != dex || !dex) {
 		dex = 0;
 	}
 	let initiative = alert("You rolled: " + roll([1, 6, parseInt(dex)]) + "!\n(1D6 + Dex)");
 	return initiative
 }
+
+// End script
 </script>
 </head>
 
@@ -88,28 +209,36 @@ function rollInit() {
 
 <div class="split" id="sheet">
 	<h2>Character stats</h2>
-	<table id="charStats">
+	<table id="charStats" onload="setInitStats()">
 		<tr><th>Attribute</th><th>Value</th></tr>
-		<tr><th>Bod</th><td><input id="bod" style="width:25px"></input></th></tr>
-		<tr><td>Mov</td><td><input id="mov" style="width:25px"></input></th></tr>
-		<tr><td>Str</td><td><input id="str" style="width:25px"></input></th></tr>
-		<tr><td>Con</td><td><input id="con" style="width:25px"></input></th></tr>
-		<tr><td>Tgh</td><td><input id="tgh" style="width:25px"></input></th></tr>
-		<tr><th>Chi</th><td><input id="chi" style="width:25px"></input></th></tr>
-		<tr><td>For</td><td><input id="for" style="width:25px"></input></th></tr>
-		<tr><td>Fu</td><td><input id="fu" style="width:25px"></input></th></tr>
-		<tr><td>Mag</td><td><input id="mag" style="width:25px"></input></th></tr>
-		<tr><th>Mnd</th><td><input id="mnd" style="width:25px"></input></th></tr>
-		<tr><td>Cha</td><td><input id="cha" style="width:25px"></input></th></tr>
-		<tr><td>Int</td><td><input id="int" style="width:25px"></input></th></tr>
-		<tr><td>Per</td><td><input id="per" style="width:25px"></input></th></tr>
-		<tr><td>Wil</td><td><input id="wil" style="width:25px"></input></th></tr>
-		<tr><th>Ref</th><td><input id="ref" style="width:25px"></input></th></tr>
-		<tr><td>Agl</td><td><input id="agl" style="width:25px"></input></th></tr>
-		<tr><td>Dex</td><td><input id="dex" style="width:25px"></input></th></tr>
-		<tr><td>Spd</td><td><input id="spd" style="width:25px"></input></th></tr>
+		<tr><th>Bod</th><td><input onchange="setCharAttribute(this)" type="number" id="bod" style="width:35px"></input></th></tr>
+		<tr><td>Mov</td><td><input onchange="setCharAttribute(this)" type="number" id="mov" style="width:35px"></input></th></tr>
+		<tr><td>Str</td><td><input onchange="setCharAttribute(this)" type="number" id="str" style="width:35px"></input></th></tr>
+		<tr><td>Con</td><td><input onchange="setCharAttribute(this)" type="number" id="con" style="width:35px"></input></th></tr>
+		<tr><td>Tgh</td><td><input onchange="setCharAttribute(this)" type="number" id="tgh" style="width:35px"></input></th></tr>
+		<tr><th>Chi</th><td><input onchange="setCharAttribute(this)" type="number" id="chi" style="width:35px"></input></th></tr>
+		<tr><td>For</td><td><input onchange="setCharAttribute(this)" type="number" id="for" style="width:35px"></input></th></tr>
+		<tr><td>Fu</td><td><input onchange="setCharAttribute(this)" type="number" id="fu" style="width:35px"></input></th></tr>
+		<tr><td>Mag</td><td><input onchange="setCharAttribute(this)" type="number" id="mag" style="width:35px"></input></th></tr>
+		<tr><th>Mnd</th><td><input onchange="setCharAttribute(this)" type="number" id="mnd" style="width:35px"></input></th></tr>
+		<tr><td>Cha</td><td><input onchange="setCharAttribute(this)" type="number" id="cha" style="width:35px"></input></th></tr>
+		<tr><td>Int</td><td><input onchange="setCharAttribute(this)" type="number" id="int" style="width:35px"></input></th></tr>
+		<tr><td>Per</td><td><input onchange="setCharAttribute(this)" type="number" id="per" style="width:35px"></input></th></tr>
+		<tr><td>Wil</td><td><input onchange="setCharAttribute(this)" type="number" id="wil" style="width:35px"></input></th></tr>
+		<tr><th>Ref</th><td><input onchange="setCharAttribute(this)" type="number" id="ref" style="width:35px"></input></th></tr>
+		<tr><td>Agl</td><td><input onchange="setCharAttribute(this)" type="number" id="agl" style="width:35px"></input></th></tr>
+		<tr><td>Dex</td><td><input onchange="setCharAttribute(this)" type="number" id="dex" style="width:35px"></input></th></tr>
+		<tr><td>Spd</td><td><input onchange="setCharAttribute(this)" type="number" id="spd" style="width:35px"></input></th></tr>
 	</table>
-	<button id="initiative" onclick="rollInit()">Roll initiative!</button>
+	<p><button id="initiative" onclick="rollInit()">Roll initiative!</button></p>
+	
+	<table id="skillsTable">
+		<tr><th>Skills</th><th>Rank</th></tr>
+	</table>
+	
+	<table id="schticksTable">
+		<tr><th>Schticks</th><th>Rank</th></tr>
+	</table>
 </div>
 
 <div class="bottom" id="descriptions">
