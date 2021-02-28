@@ -281,7 +281,7 @@ async function initPage() {
     let kroppSelect = document.getElementById("kroppsDel2");
 
     // Sätter värden i inputs och selects
-    const skadeTabeller = await getDamageTables();
+    skadeTabeller = await getDamageTables();
     damageInput.value = 0;
     for (tabell in skadeTabeller) {
         let tabellOption = document.createElement("option");
