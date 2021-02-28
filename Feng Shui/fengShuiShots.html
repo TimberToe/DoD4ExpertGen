@@ -118,8 +118,9 @@
 	<h1>Feng Shui: Shots Counter</h1>
 	<h2>How many actors?</h2>
 	<p><strong>Warning:</strong> Updating this value will reset the table and all values!</p>
-	<input type="number" id="actors" style="width:50px" onchange="setActorTable()"></input>
+	<input type="number" id="actors" style="width:50px" onchange="setActorTable()" value=0></input>
 	<h2>Shot order:</h2>
+	<p><strong>Hint:</strong> When someone is dead, set them to shot -1 permanently!</p>
 	<table id="actorTable">
 	</table>
 	<p><strong>Warning:</strong> Fill in all values above before clicking "Update table"!</p>
