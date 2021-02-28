@@ -1,0 +1,128 @@
+﻿<!doctype HTML>
+<html>
+<head>
+	<title>Feng Shui: Shots Counter</title>
+	<script>
+		if (!(localStorage.getItem("actorObj"))) {
+			var actorObj = {};
+			localStorage.setItem("actorObj", "{}")
+		} else {
+			actorObj = JSON.parse(localStorage.getItem("actorObj"));
+		}
+		
+	
+		function setActorTable() {
+			// Creates empty table over actors and shots
+			if (!(document.getElementById("actors").value)) {
+				alert("Must be numerical value!");
+				return
+			}
+			var actorAmount = Math.floor(parseInt(document.getElementById("actors").value));
+			var tableText = "<tr><th>Actor Name</th><th>Shot</th></tr>";
+			
+			for (let i=0;i<parseInt(actorAmount);i++) {
+				tableText += "<tr><td>";
+				tableText += "<input id='actor" + i + "'></input></td><td>";
+				tableText += "<input id='shot" + i + "' onchange='setShotsOrder()' type='number' style='width: 40px' value=0></input></td></tr>";
+			}
+			tableText += "<tr><th>Actor Name</th><th>Shot</th></tr>";
+			document.getElementById("actorTable").innerHTML = tableText;
+			return
+		}
+
+		
+		function setShotsOrder() {
+			// Sorts order of shots and characters
+			actorObj = {};
+			var actorAmount = document.getElementById("actors").value;
+
+			for (let i=0;i<parseInt(actorAmount);i++) {
+				let thisActor = document.getElementById("actor" + i).value;
+				let thisShot = document.getElementById("shot" + i).value;
+				actorObj[thisActor] = thisShot;
+			}
+			
+			actorObj = sortObjectByValue(actorObj);
+			return actorObj
+		}
+
+
+		function resetShotTable() {
+			// Empties the actor/shot table and refills it with new order of shots
+			let tableText = "<tr><th>Actor Name</th><th>Shot</th></tr>";
+			let i = 0;
+
+			for (actor in actorObj) {
+				tableText += "<tr><td>";
+				tableText += "<input id='actor" + i + "' value='" + actor + "'></input></td><td>";
+				tableText += "<input id='shot" + i + "' onchange='setShotsOrder()' type='number' style='width: 40px' value=" + parseInt(actorObj[actor]) + "></input></td></tr>";
+				i++;
+			}
+			tableText += "<tr><th>Actor Name</th><th>Shot</th></tr>";
+			document.getElementById("actorTable").innerHTML = tableText;
+			return
+		}
+
+
+		function sortObjectByValue(object) {
+			// Sorts an object from values
+			let sortedObject = {};
+			let keys = [];
+			let values = [];
+
+			for (key in object) {
+				values.push(parseInt(object[key]));
+			}
+
+			values.sort(function(a, b){return b - a});
+
+			for (let i=0;i<values.length;i++) {
+				let thisActors = getKeys(object, false, values[i]);
+
+				for (let x=0;x<thisActors.length;x++) {
+					sortedObject[thisActors[x]] = values[i];
+				}
+			}
+			console.log(sortedObject);
+			return sortedObject
+		}	
+
+			
+		function getKeys(object, matchKey=true, matchValue=false) {
+			// Returns array of keys from an object from either key or values
+			var matches = [];
+
+			for (key in object) {
+				if (matchKey) {
+					if (key == matchKey) {
+						matches.push(key);
+					}
+				}
+				if (matchValue) {
+					if (object[key] == matchValue) {
+						matches.push(key);
+					}
+				}
+			}
+			console.log(matches);
+			return matches
+		}
+		
+	</script>
+	<style>
+		body {background-color: black}
+		h1,h2,h3,th,td,p {font-family: calibri;color: white}
+	</style>
+</head>
+<body>
+	<h1>Feng Shui: Shots Counter</h1>
+	<h2>How many actors?</h2>
+	<p><strong>Warning:</strong> Updating this value will reset the table and all values!</p>
+	<input type="number" id="actors" style="width:50px" onchange="setActorTable()"></input>
+	<h2>Shot order:</h2>
+	<table id="actorTable">
+	</table>
+	<p><strong>Warning:</strong> Fill in all values above before clicking "Update table"!</p>
+	<button onclick="setShotsOrder();resetShotTable()" style="width:120px;height:35px"><strong>Update table</strong></button>
+</body>
+</html>
