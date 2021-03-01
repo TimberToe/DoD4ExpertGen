@@ -134,15 +134,17 @@
 
 
 		function calcCombatDamage() {
+			let atkAttr = Math.floor(parseInt(document.getElementById("atkAttr").value));
 			let atkSkill = Math.floor(parseInt(document.getElementById("atkSkill").value));
 			let atkSchtick = Math.floor(parseInt(document.getElementById("atkSchtick").value));
 			let atkRoll = Math.floor(parseInt(document.getElementById("atkRoll").value));
+			let defAttr = Math.floor(parseInt(document.getElementById("defAttr").value));
 			let defSkill = Math.floor(parseInt(document.getElementById("defSkill").value));
 			let defSchtick = Math.floor(parseInt(document.getElementById("defSchtick").value));
 			let defRoll = Math.floor(parseInt(document.getElementById("defRoll").value));
 
-			let attackerValue = parseInt(atkSkill + atkSchtick + atkRoll);
-			let defenderValue = parseInt(defSkill + defSchtick + defRoll);
+			let attackerValue = parseInt(atkAttr + atkSkill + atkSchtick + atkRoll);
+			let defenderValue = parseInt(defAttr + defSkill + defSchtick + defRoll);
 
 			let totalOutcome = parseInt(attackerValue - defenderValue);
 
@@ -229,15 +231,17 @@
 	<div id="combat">
 		<h2>Combat calculator</h2>
 		<table>
-			<tr><th>Actor</th><th>Skill</th><th>Schtick</th><th>Roll/Active Defense</th></tr>
+			<tr><th>Actor</th><th>Attribute</th><th>Skill</th><th>Schtick</th><th>Roll/Active Defense</th></tr>
 			<tr>
 				<th>Attacker</th>
+				<td><input value=1 style="width:50px" type="number" id="atkAttr"></input></th>
 				<td><input value=1 style="width:50px" type="number" id="atkSkill"></input></th>
 				<td><input value=1 style="width:50px" type="number" id="atkSchtick"></input></th>
 				<td><input value=1 style="width:50px" type="number" id="atkRoll"></input></th>
 			</tr>
 			<tr>
 				<th>Defender</th>
+				<td><input value=1 style="width:50px" type="number" id="defAttr"></input></th>
 				<td><input value=1 style="width:50px" type="number" id="defSkill"></input></th>
 				<td><input value=1 style="width:50px" type="number" id="defSchtick"></input></th>
 				<td><input value=1 style="width:50px" type="number" id="defRoll"></input></th>
@@ -246,7 +250,8 @@
 		<table>
 			<tr><th>Button</th><th>Outcome</th></tr>
 			<tr>
-				<th><button onclick="document.getElementById('combatOutcome').innerHTML = calcCombatDamage()">Calculate damage</button></th><th id="combatOutcome"></th>
+				<th><button onclick="document.getElementById('combatOutcome').innerHTML = calcCombatDamage()">Calculate damage</button></th>
+				<th id="combatOutcome">0</th>
 			</tr>
 		</table>
 		<h2>Roll normal dice</h2>
