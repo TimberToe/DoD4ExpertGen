@@ -4,11 +4,29 @@
 	<title>Feng Shui: Shots Counter</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
 	<script>
-		if (!(localStorage.getItem("actorObj"))) {
-			var actorObj = {};
-			localStorage.setItem("actorObj", "{}")
-		} else {
-			actorObj = JSON.parse(localStorage.getItem("actorObj"));
+		function initPage() {
+			if (!(localStorage.getItem("actorObj"))) {
+				actorObj = {"Mook1": 8};
+				localStorage.setItem("actorObj", JSON.stringify(actorObj));
+			} else {
+				actorObj = JSON.parse(localStorage.getItem("actorObj"));
+			}
+
+			if (!(localStorage.getItem("actorValue"))) {
+				actorValue = 1;
+				localStorage.setItem("actorValue", actorValue)
+				setActorTable();
+				document.getElementById("actor0").value = "Mook1";
+				document.getElementById("shot0").value = 8;
+			} else {
+				actorValue = parseInt(localStorage.getItem("actorValue"));
+				document.getElementById("actors").value = actorValue;
+				setActorTable();
+				if (actorObj) {
+					resetShotTable();
+				}
+			}
+			return
 		}
 		
 	
@@ -19,12 +37,14 @@
 				return
 			}
 			var actorAmount = Math.floor(parseInt(document.getElementById("actors").value));
+			actorValue = actorAmount;
+			localStorage.setItem("actorValue", actorValue)
 			var tableText = "<tr><th>Actor Name</th><th>Shot</th></tr>";
 			
 			for (let i=0;i<parseInt(actorAmount);i++) {
 				tableText += "<tr><td>";
 				tableText += "<input id='actor" + i + "'></input></td><td>";
-				tableText += "<input id='shot" + i + "' onchange='setShotsOrder()' type='number' style='width: 40px' value=0></input></td></tr>";
+				tableText += "<input id='shot" + i + "' onchange='setShotsOrder()' type='number' style='width: 40px' value=0></input></td><td></tr>";
 			}
 			tableText += "<tr><th>Actor Name</th><th>Shot</th></tr>";
 			document.getElementById("actorTable").innerHTML = tableText;
@@ -35,6 +55,7 @@
 		function setShotsOrder() {
 			// Sorts order of shots and characters
 			actorObj = {};
+
 			var actorAmount = document.getElementById("actors").value;
 
 			for (let i=0;i<parseInt(actorAmount);i++) {
@@ -44,24 +65,91 @@
 			}
 			
 			actorObj = sortObjectByValue(actorObj);
+			localStorage.setItem("actorObj", JSON.stringify(actorObj));
 			return actorObj
 		}
 
 
 		function resetShotTable() {
 			// Empties the actor/shot table and refills it with new order of shots
-			let tableText = "<tr><th>Actor Name</th><th>Shot</th></tr>";
+			let tableText = "<tr><th>Actor Name</th><th>Shot</th><th>Dead</th></tr>";
 			let i = 0;
 
 			for (actor in actorObj) {
 				tableText += "<tr><td>";
 				tableText += "<input id='actor" + i + "' value='" + actor + "'></input></td><td>";
-				tableText += "<input id='shot" + i + "' onchange='setShotsOrder()' type='number' style='width: 40px' value=" + parseInt(actorObj[actor]) + "></input></td></tr>";
+				tableText += "<input id='shot" + i + "' onchange='setShotsOrder()' type='number' style='width: 40px' value=" + parseInt(actorObj[actor]) + "></input></td><td><input type='checkbox' id='" + actor + "' onchange='deleteActor(actorObj, this.id)'></input></td></tr>";
 				i++;
 			}
-			tableText += "<tr><th>Actor Name</th><th>Shot</th></tr>";
+			tableText += "<tr><th>Actor Name</th><th>Shot</th><th>Dead</th></tr>";
 			document.getElementById("actorTable").innerHTML = tableText;
 			return
+		}
+
+
+		function rollDice(array=[1,6,0]) {
+			let rollSum = 0;
+			for (rolls=0;rolls<Math.floor(parseInt(array[0]));rolls++) {
+				let currentRoll = Math.floor(Math.random() * array[1]) + 1;
+				rollSum += currentRoll;
+			}
+			return Math.floor(parseInt(rollSum + parseInt(array[2])))
+		}
+
+
+		function fengShuiDice() {
+			let rollSum = 0;
+			let positive = [];
+			let negative = [];
+
+			for (let i=0;i<1;i++) {
+				let thisRoll = parseInt(rollDice());
+				positive.push(thisRoll);
+
+				if (thisRoll == 6) {
+					i--
+				}
+			}
+
+			for (let i=0;i<1;i++) {
+				let thisRoll = parseInt(rollDice());
+				negative.push(thisRoll);
+
+				if (thisRoll == 6) {
+					i--
+				}
+			}
+
+			for (let i = 0;i<positive.length;i++) {
+				rollSum += parseInt(positive[i]);
+			}
+			
+			for (let i = 0;i<negative.length;i++) {
+				rollSum -= parseInt(negative[i]);
+			}
+
+			console.log("Sum = " + rollSum + ", Based on rolls: (" + positive + ") - (" + negative + ")");
+			return [rollSum, "(" + positive + ") - (" + negative + ")"]
+		}
+
+
+		function calcCombatDamage() {
+			let atkSkill = Math.floor(parseInt(document.getElementById("atkSkill").value));
+			let atkSchtick = Math.floor(parseInt(document.getElementById("atkSchtick").value));
+			let atkRoll = Math.floor(parseInt(document.getElementById("atkRoll").value));
+			let defSkill = Math.floor(parseInt(document.getElementById("defSkill").value));
+			let defSchtick = Math.floor(parseInt(document.getElementById("defSchtick").value));
+			let defRoll = Math.floor(parseInt(document.getElementById("defRoll").value));
+
+			let attackerValue = parseInt(atkSkill + atkSchtick + atkRoll);
+			let defenderValue = parseInt(defSkill + defSchtick + defRoll);
+
+			let totalOutcome = parseInt(attackerValue - defenderValue);
+
+			if (totalOutcome < 0) {
+				totalOutcome = 0;
+			}
+			return totalOutcome
 		}
 
 
@@ -84,7 +172,7 @@
 					sortedObject[thisActors[x]] = values[i];
 				}
 			}
-			console.log(sortedObject);
+			//console.log(sortedObject);
 			return sortedObject
 		}	
 
@@ -105,26 +193,84 @@
 					}
 				}
 			}
-			console.log(matches);
+			//console.log(matches);
 			return matches
+		}
+
+		function deleteActor(object, id) {
+			delete object[id];
+			resetShotTable();
+			document.getElementById("actors").value = parseInt(document.getElementById("actors").value - 1);
+			localStorage.setItem("actorObj", JSON.stringify(actorObj));
+			localStorage.setItem("actorValue", parseInt(document.getElementById("actors").value));
+			return object
 		}
 		
 	</script>
 	<style>
 		body {background-color: black}
 		h1,h2,h3,th,td,p {font-family: calibri;color: white}
+		th,td {text-align: left}
+		div {border: 1px solid gray;padding: 5px}
 	</style>
 </head>
-<body>
-	<h1>Feng Shui: Shots Counter</h1>
-	<h2>How many actors?</h2>
-	<p><strong>Warning:</strong> Updating this value will reset the table and all values!</p>
-	<input type="number" id="actors" style="width:50px" onchange="setActorTable()" value=0></input>
-	<h2>Shot order:</h2>
-	<p><strong>Hint:</strong> When someone is dead, set them to shot -1 permanently!</p>
-	<table id="actorTable">
-	</table>
-	<p><strong>Warning:</strong> Fill in all values above before clicking "Update table"!</p>
-	<button onclick="setShotsOrder();resetShotTable()" style="width:120px;height:35px"><strong>Update table</strong></button>
+<body onload="initPage()">
+	<h1>Feng Shui: Combat Helper</h1>
+	<div id="shots">
+		<h2>How many actors?</h2>
+		<p><strong>Warning:</strong> Updating this value will reset the table and all values!</p>
+		<input type="number" id="actors" style="width:50px" onchange="setActorTable()" value=0></input>
+		<h2>Shot order:</h2>
+		<table id="actorTable">
+		</table>
+		<p><strong>Warning:</strong> Fill in all values above before clicking "Update table"!</p>
+		<button onclick="setShotsOrder();resetShotTable()" style="width:120px;height:35px"><strong>Update table</strong></button>
+	</div>
+	<div id="combat">
+		<h2>Combat calculator</h2>
+		<table>
+			<tr><th>Actor</th><th>Skill</th><th>Schtick</th><th>Roll/Active Defense</th></tr>
+			<tr>
+				<th>Attacker</th>
+				<td><input value=1 style="width:50px" type="number" id="atkSkill"></input></th>
+				<td><input value=1 style="width:50px" type="number" id="atkSchtick"></input></th>
+				<td><input value=1 style="width:50px" type="number" id="atkRoll"></input></th>
+			</tr>
+			<tr>
+				<th>Defender</th>
+				<td><input value=1 style="width:50px" type="number" id="defSkill"></input></th>
+				<td><input value=1 style="width:50px" type="number" id="defSchtick"></input></th>
+				<td><input value=1 style="width:50px" type="number" id="defRoll"></input></th>
+			</tr>
+		</table>
+		<table>
+			<tr><th>Button</th><th>Outcome</th></tr>
+			<tr>
+				<th><button onclick="document.getElementById('combatOutcome').innerHTML = calcCombatDamage()">Calculate damage</button></th><th id="combatOutcome"></th>
+			</tr>
+		</table>
+		<h2>Roll normal dice</h2>
+		<table>
+			<tr><th>Dice</th><th>D</th><th>Type</th><th>+</th><th>Bonus</th><th></th><th>Outcome</th></tr>
+			<tr>
+				<td><input value=1 style="width:50px" type="number" id="diceAmount"></input></td>
+				<td>D</td>
+				<td><input value=6 style="width:50px" type="number" id="diceType"></input></td>
+				<td>+</td>
+				<td><input value=0 style="width:50px" type="number" id="diceBonus"></input></td>
+				<td><button onclick="document.getElementById('rollOutcome2').innerHTML = rollDice([document.getElementById('diceAmount').value, document.getElementById('diceType').value, document.getElementById('diceBonus').value])"><strong>Roll</strong></button></td>
+				<td style="padding-left:10px" id="rollOutcome2">0</td>
+			</tr>
+		</table>
+		<h2>Feng Shui-diceroller</h2>
+		<table>
+			<tr><th>Roll</th><th>Outcome</th></tr>
+			<tr>
+				<td><button onclick="let thisRoll = fengShuiDice();document.getElementById('rollOutcome').innerHTML = thisRoll[0] + ', based on: ' + thisRoll[1]"><strong>Roll</strong></button></td>
+				<td style="padding-left:10px" id="rollOutcome">0</td>
+			</tr>
+		</table>
+
+	</div>
 </body>
 </html>
