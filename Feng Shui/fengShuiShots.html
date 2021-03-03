@@ -13,7 +13,7 @@
 			}
 
 			if (!(localStorage.getItem("combatObj"))) {
-				combatObj = {};
+				combatObj = {"Mook1": {"offSkill": 0, "offScht": 0, "damage": 0, "other": 0, "offRoll": 0, "dodge": 0, "actDodge": 0, "defScht": 0, "tgh": 0, "armor": 0}};
 				localStorage.setItem("combatObj", JSON.stringify("combatObj"));
 			} else {
 				combatObj = JSON.parse(localStorage.getItem("combatObj"));
@@ -25,13 +25,14 @@
 				setActorTable();
 				document.getElementById("actor0").value = "Mook1";
 				document.getElementById("shot0").value = 8;
+				resetShotTable();
+				addCombatants();
 			} else {
 				actorValue = parseInt(localStorage.getItem("actorValue"));
 				document.getElementById("actors").value = actorValue;
 				setActorTable();
-				if (actorObj) {
-					resetShotTable();
-				}
+				resetShotTable();
+				addCombatants();
 			}
 			return
 		}
@@ -40,21 +41,63 @@
 		function setActorTable() {
 			// Creates empty table over actors and shots
 			if (!(document.getElementById("actors").value)) {
+				// Must have a value assigned
 				alert("Must be numerical value!");
 				return
 			}
-			var actorAmount = Math.floor(parseInt(document.getElementById("actors").value));
+
+			// Set actor value
+			let actorAmount = Math.floor(parseInt(document.getElementById("actors").value));
+			if (parseInt(actorAmount) < 1) {
+				// Must be greater than 0
+				alert("Number of actors must be greater than 0!");
+				document.getElementById("actors").value = parseInt(1);
+				return
+			}
+
+			// Set values
 			actorValue = actorAmount;
 			localStorage.setItem("actorValue", actorValue)
-			var tableText = "<tr><th>Actor Name</th><th>Shot</th></tr>";
-			
+
+			let actors = [];
+			let shots = [];
+			for (actor in actorObj) {
+				actors.push(actor);
+				shots.push(actorObj[actor]);
+			}
+
+			// Begin creating table
+			let tableText = "<tr><th>Actor Name</th><th>Shot</th></tr>";
+
+			// Set mooks
+			let mook = 1;
+			for (actor in actorObj) {
+				if (actor.substr(0,4).toLowerCase() == "mook") {
+					mook++
+				}
+			}
+
 			for (let i=0;i<parseInt(actorAmount);i++) {
 				tableText += "<tr>";
-				tableText += `<td><input id='actor${i}'></input></td>`;
-				tableText += `<td><input id='shot${i}' onchange='setShotsOrder()' type='number' style='width: 40px' value=0></input></td>`;
+				if (!(actors[i])) {
+					while (actorObj["Mook" + mook]) {
+						mook++
+					}
+					tableText += `<td><input id='actor${i}' value='Mook${parseInt(mook)}'></input></td>`;
+					actorObj["Mook" + parseInt(mook)] = 8;
+					mook++
+				} else {
+					tableText += `<td><input id='actor${i}' value='${actors[i]}'></input></td>`;
+				}
+				if (!(shots[i])) {
+					tableText += `<td><input id='shot${i}' onchange='setShotsOrder()' type='number' style='width: 40px' value=8></input></td>`;
+				} else {
+					tableText += `<td><input id='shot${i}' onchange='setShotsOrder()' type='number' style='width: 40px' value=${parseInt(shots[i])}></input></td>`;
+				}
 				tableText += "</tr>";
 			}
 			tableText += "<tr><th>Actor Name</th><th>Shot</th></tr>";
+
 			document.getElementById("actorTable").innerHTML = tableText;
 			return
 		}
@@ -69,6 +112,10 @@
 			for (let i=0;i<parseInt(actorAmount);i++) {
 				let thisActor = document.getElementById("actor" + i).value;
 				let thisShot = document.getElementById("shot" + i).value;
+				if (actorObj[thisActor]) {
+					alert("Duplicate detected: " + thisActor + "!\nDuplicates do not show in combat tables!")
+					continue
+				}
 				actorObj[thisActor] = thisShot;
 			}
 			
@@ -143,10 +190,21 @@
 
 
 		function calcCombatDamage() {
+		// Calculates To-Hit and Damage
+		/*
+			To Hit:
+				Skill bonus + Roll + (Schtick) + Other positive/negative
+				vs.
+				Dodge skill/attribute value + (Active dodge) + (Schtick)
+			If hit, damage =
+				Hit outcome + Damage + (Schtick)
+				vs.
+				Toughness + Armor + (Schtick)
+		*/
 			let attackers = document.getElementsByName("attackers");
 			let defenders = document.getElementsByName("defenders");
-			var attacker = "";
-			var defender = ""
+			let attacker;
+			let defender;
 
 			for (let i=0;i<attackers.length;i++) {
 				if (attackers[i].checked) {
@@ -165,84 +223,104 @@
 				return
 			}
 
-			let offAttr = Math.floor(parseInt(document.getElementById("offAttr" + attacker).value));
+			// Set attacker skills
 			let offSkill = Math.floor(parseInt(document.getElementById("offSkill" + attacker).value));
 			let offScht = Math.floor(parseInt(document.getElementById("offScht" + attacker).value));
+			let damage = Math.floor(parseInt(document.getElementById("damage" + attacker).value));
+			let other = Math.floor(parseInt(document.getElementById("other" + attacker).value));
 			let offRoll = Math.floor(parseInt(document.getElementById("offRoll" + attacker).value));
-			let defAttr = Math.floor(parseInt(document.getElementById("defAttr" + defender).value));
-			let defSkill = Math.floor(parseInt(document.getElementById("defSkill" + defender).value));
+
+			// Set defender skills
+			let dodge = Math.floor(parseInt(document.getElementById("dodge" + defender).value));
+			let actDodge = Math.floor(parseInt(document.getElementById("actDodge" + defender).value));
 			let defScht = Math.floor(parseInt(document.getElementById("defScht" + defender).value));
-			let defRoll = Math.floor(parseInt(document.getElementById("defRoll" + defender).value));
+			let tgh = Math.floor(parseInt(document.getElementById("tgh" + defender).value));
+			let armor = Math.floor(parseInt(document.getElementById("armor" + defender).value));
+			
+			// Set To-Hit-values
+			let toHit = parseInt(offSkill + offScht + offRoll + other);
+			let toDefend = parseInt(dodge + actDodge + defScht);
 
-			let attackerValue = parseInt(offAttr + offSkill + offScht + offRoll);
-			let defenderValue = parseInt(defAttr + defSkill + defScht + defRoll);
+			// Calculate To-Hit, if doesn't hit, return Miss
+			if (toHit <= toDefend) {
+				return `${attacker} attack: ${toHit} vs. ${defender} defense: ${toDefend} = Miss!`
+			}
 
-			let totalOutcome = parseInt(attackerValue - defenderValue);
+			// If it's a hit:
+			let hitOutcome = parseInt(toHit - toDefend);
+			// console.log("Hit outcome: " + hitOutcome + "!");
+
+			let totalDamage = parseInt(hitOutcome + damage);
+			// console.log("totalDamage: " + totalDamage);
+			let totalDefense = parseInt(tgh + armor);
+			// console.log("totalDefense: " + totalDefense);
+
+			totalOutcome = parseInt(totalDamage - totalDefense);
 
 			if (totalOutcome < 0) {
 				totalOutcome = 0;
 			}
-			return totalOutcome
-		}
-
-
-		function sortObjectByValue(object) {
-			// Sorts an object from values
-			let sortedObject = {};
-			let keys = [];
-			let values = [];
-
-			for (key in object) {
-				values.push(parseInt(object[key]));
-			}
-
-			values.sort(function(a, b){return b - a});
-
-			for (let i=0;i<values.length;i++) {
-				let thisActors = getKeys(object, false, values[i]);
-
-				for (let x=0;x<thisActors.length;x++) {
-					sortedObject[thisActors[x]] = values[i];
-				}
-			}
-			//console.log(sortedObject);
-			return sortedObject
+			return `${attacker} hits ${defender} for ${totalOutcome} damage!`
 		}
 
 
 		function addCombatants() {
-			let tableText = "<tr><th>Combatant</th><th>Off. Attribute</th><th>Def. Attribute</th><th>Off. Skill</th><th>Def. Skill</th><th>Off. Schtick</th><th>Def. Shtick</th><th>Off. Roll/Bonus</th><th>Def. Roll/Bonus</th><th>Attacker</th><th>Defender</th></tr>";
+			/*
+			Offensive fields required:
+				Off. Skill, Off. Schtick, Damage, Other, Roll
+			
+			Defensive fields required:
+				Dodge, Active dodge, Def. Schtick, Toughness, Armor
+			*/
+			let tableText = "<tr><th>Combatant</th><th>Off. Skill</th><th>Off. Schtick</th><th>Other</th><th>Damage</th><th>Roll<th>Attacker</th></tr>";
 			let i = 0;
 
+			// Make attacker table
 			for (actor in actorObj) {
 				if (!(combatObj[actor])) {
-					combatObj[actor] = {"offAttr": 0, "defAttr": 0, "offSkill": 0, "defSkill": 0, "offScht": 0, "defScht": 0, "offRoll": 0, "defRoll": 0};
+					combatObj[actor] = {"offSkill": 0, "offScht": 0, "damage": 0, "other": 0, "offRoll": 0, "dodge": 0, "actDodge": 0, "defScht": 0, "tgh": 0, "armor": 0};
 					localStorage.setItem("combatObj", JSON.stringify(combatObj));
 				}
 				tableText += "<tr>";
 				tableText += `<td>${actor}</td>`
-				tableText += `<td><input value=${parseInt(combatObj[actor]["offAttr"])} style="width:45px" type="number" onchange="setCharAtt('offAttr', '${actor}')" id="offAttr${actor}"></td>`;
-				tableText += `<td><input value=${parseInt(combatObj[actor]["defAttr"])} style="width:45px" type="number" onchange="setCharAtt('defAttr', '${actor}')" id="defAttr${actor}"></td>`;
 				tableText += `<td><input value=${parseInt(combatObj[actor]["offSkill"])} style="width:45px" type="number" onchange="setCharAtt('offSkill', '${actor}')" id="offSkill${actor}"></td>`;
-				tableText += `<td><input value=${parseInt(combatObj[actor]["defSkill"])} style="width:45px" type="number" onchange="setCharAtt('defSkill', '${actor}')" id="defSkill${actor}"></td>`;
 				tableText += `<td><input value=${parseInt(combatObj[actor]["offScht"])} style="width:45px" type="number" onchange="setCharAtt('offScht', '${actor}')" id="offScht${actor}"></td>`;
-				tableText += `<td><input value=${parseInt(combatObj[actor]["defScht"])} style="width:45px" type="number" onchange="setCharAtt('defScht', '${actor}')" id="defScht${actor}"></td>`;
+				tableText += `<td><input value=${parseInt(combatObj[actor]["other"])} style="width:45px" type="number" onchange="setCharAtt('other', '${actor}')" id="other${actor}"></td>`;
+				tableText += `<td><input value=${parseInt(combatObj[actor]["damage"])} style="width:45px" type="number" onchange="setCharAtt('damage', '${actor}')" id="damage${actor}"></td>`;
 				tableText += `<td><input value=${parseInt(combatObj[actor]["offRoll"])} style="width:45px" type="number" onchange="setCharAtt('offRoll', '${actor}')" id="offRoll${actor}"></td>`;
-				tableText += `<td><input value=${parseInt(combatObj[actor]["defRoll"])} style="width:45px" type="number" onchange="setCharAtt('defRoll', '${actor}')" id="defRoll${actor}"></td>`;
 				if (i == 0) {
 					tableText += `<td><input type="radio" name="attackers" type="number" id="${actor}" checked></input></td>`;
 				} else {
 					tableText += `<td><input type="radio" name="attackers" type="number" id="${actor}"></input></td>`;
 				}
-				if (i == 1) {
-					tableText += `<td><input type="radio" name="defenders" type="number" id="${actor}" checked></input></td>`;
-				} else {
-					tableText += `<td><input type="radio" name="defenders" type="number" id="${actor}"></input></td>`;
-				}
 				tableText += "</tr>";
 				i++
 			}
-			document.getElementById("realCombat").innerHTML = tableText;
+			
+			let tableText2 = "<tr><th>Combatant</th><th>Dodge</th><th>Active Dodge</th><th>Def. Schtick</th><th>Toughness</th><th>Armor</th><th>Defender</th></tr>";
+			i = 0;
+
+			// Make defender table
+			for (actor in actorObj) {
+				tableText2 += "<tr>";
+				tableText2 += `<td>${actor}</td>`
+				tableText2 += `<td><input value=${parseInt(combatObj[actor]["dodge"])} style="width:45px" type="number" onchange="setCharAtt('dodge', '${actor}')" id="dodge${actor}"></td>`;
+				tableText2 += `<td><input value=${parseInt(combatObj[actor]["actDodge"])} style="width:45px" type="number" onchange="setCharAtt('actDodge', '${actor}')" id="actDodge${actor}"></td>`;
+				tableText2 += `<td><input value=${parseInt(combatObj[actor]["defScht"])} style="width:45px" type="number" onchange="setCharAtt('defScht', '${actor}')" id="defScht${actor}"></td>`;
+				tableText2 += `<td><input value=${parseInt(combatObj[actor]["tgh"])} style="width:45px" type="number" onchange="setCharAtt('tgh', '${actor}')" id="tgh${actor}"></td>`;
+				tableText2 += `<td><input value=${parseInt(combatObj[actor]["armor"])} style="width:45px" type="number" onchange="setCharAtt('armor', '${actor}')" id="armor${actor}"></td>`;
+				if (i == 1) {
+					tableText2 += `<td><input type="radio" name="defenders" type="number" id="${actor}" checked></input></td>`;
+				} else {
+					tableText2 += `<td><input type="radio" name="defenders" type="number" id="${actor}"></input></td>`;
+				}
+				tableText2 += "</tr>";
+				i++
+			}
+
+			// Set tables 
+			document.getElementById("attackerTable").innerHTML = tableText;
+			document.getElementById("defenderTable").innerHTML = tableText2;
 			return
 		}
 
@@ -280,7 +358,37 @@
 			return matches
 		}
 
+
+		function sortObjectByValue(object) {
+			// Sorts an object from values
+			let sortedObject = {};
+			let keys = [];
+			let values = [];
+
+			for (key in object) {
+				values.push(parseInt(object[key]));
+			}
+
+			values.sort(function(a, b){return b - a});
+
+			for (let i=0;i<values.length;i++) {
+				let thisActors = getKeys(object, false, values[i]);
+
+				for (let x=0;x<thisActors.length;x++) {
+					sortedObject[thisActors[x]] = values[i];
+				}
+			}
+			//console.log(sortedObject);
+			return sortedObject
+		}
+
+
 		function deleteActor(object, id) {
+			if (parseInt(document.getElementById("actors").value) == 1) {
+				alert("List cannot be empty!");
+				document.getElementById(id).checked = false;
+				return
+			}
 			delete object[id];
 			resetShotTable();
 			document.getElementById("actors").value = parseInt(document.getElementById("actors").value - 1);
@@ -294,30 +402,47 @@
 		body {background-color: black}
 		h1,h2,h3,th,td,p {font-family: calibri;color: white}
 		th,td {text-align: left}
-		div, th, td {border: 1px solid gray;padding: 5px}
+		div, th, td {border-bottom: 1px solid gray;border-top: 1px solid gray;padding: 5px; border-collapse: collapse;}
 	</style>
 </head>
 <body onload="initPage()">
 	<h1>Feng Shui: Combat Helper</h1>
 	<div id="shots">
 		<h2>How many actors?</h2>
-		<p><strong>Warning:</strong> Updating this value will reset the table and all values!</p>
+		<p><em>Updating this value may reset values!</em></p>
 		<input type="number" id="actors" style="width:50px" onchange="setActorTable()" value=0></input>
 		<h2>Shot order:</h2>
 		<table id="actorTable">
 		</table>
-		<p><strong>Warning:</strong> Fill in all values above before clicking "Update table"!</p>
-		<button onclick="setShotsOrder();resetShotTable();addCombatants()" style="width:120px;height:35px"><strong>Update table</strong></button>
+		<p><em>Fill in all entries above before clicking "Update tables"!</em></p>
+		<button onclick="setShotsOrder();resetShotTable();addCombatants()" style="width:120px;height:35px"><strong>Update tables</strong></button>
 	</div>
 	<div id="combat">
 		<h2>Combat calculator</h2>
-		<table id="realCombat">
+		<p><strong>To-hit =</strong> Attacker (Off. Skill + Off. Schtick + Roll + Other) - Defender (Dodge + Active Dodge + Def. Schtick<br>
+			<em>If the attack hits (To-hit is greater than 0):</em><br>
+			<strong>Damage =</strong> Attacker (To-Hit Outcome + Damage) - Defender (Toughness + Armor)</p>
+		<h3>Attacker:</h3>
+		<table id="attackerTable">
 		</table>
+		<h3>Defender:</h3>
+		<table id="defenderTable">
+		</table>
+		<h3>Outcome:</h3>
 		<table>
-			<tr><th>Button</th><th>Outcome</th></tr>
+			<tr><th>Roll</th><th>Outcome</th></tr>
 			<tr>
 				<th><button onclick="document.getElementById('combatOutcome').innerHTML = calcCombatDamage()">Calculate damage</button></th>
 				<th id="combatOutcome">0</th>
+			</tr>
+		</table>
+		<h2>Feng Shui-diceroller</h2>
+		<p><em>Roll 1d6 - 1d6; Each 6 explodes; If both initial dies are sixes.<br>It's a critical success if value is positive, or a critical failure if the value is negative!</em></p>
+		<table>
+			<tr><th>Roll</th><th>Outcome</th></tr>
+			<tr>
+				<td><button onclick="let thisRoll = fengShuiDice();document.getElementById('rollOutcome').innerHTML = thisRoll[0] + ', based on: ' + thisRoll[1]"><strong>Roll</strong></button></td>
+				<td style="padding-left:10px" id="rollOutcome">0</td>
 			</tr>
 		</table>
 		<h2>Roll normal dice</h2>
@@ -333,15 +458,6 @@
 				<td style="padding-left:10px" id="rollOutcome2">0</td>
 			</tr>
 		</table>
-		<h2>Feng Shui-diceroller</h2>
-		<table>
-			<tr><th>Roll</th><th>Outcome</th></tr>
-			<tr>
-				<td><button onclick="let thisRoll = fengShuiDice();document.getElementById('rollOutcome').innerHTML = thisRoll[0] + ', based on: ' + thisRoll[1]"><strong>Roll</strong></button></td>
-				<td style="padding-left:10px" id="rollOutcome">0</td>
-			</tr>
-		</table>
-
 	</div>
 </body>
 </html>
