@@ -22,6 +22,7 @@
 			if (!(localStorage.getItem("actorValue"))) {
 				actorValue = 1;
 				localStorage.setItem("actorValue", actorValue)
+				document.getElementById("actors").value = parseInt(actorValue);
 				setActorTable();
 				document.getElementById("actor0").value = "Mook1";
 				document.getElementById("shot0").value = 8;
@@ -29,7 +30,7 @@
 				addCombatants();
 			} else {
 				actorValue = parseInt(localStorage.getItem("actorValue"));
-				document.getElementById("actors").value = actorValue;
+				document.getElementById("actors").value = parseInt(actorValue);
 				setActorTable();
 				resetShotTable();
 				addCombatants();
