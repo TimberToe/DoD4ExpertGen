@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        .wrapper {
+            text-align: center;
+        }
+        
+        input[type=number] {
+            width: 2em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="title">
+            <h1>Dice Roller</h1>
+        </div>
+        <div class="container">
+            <div id="resultWrapper">
+
+            </div>
+            <div id="controls">
+                <div>
+                    <input id="dice" type="number" value=2></input> t6 + <input id="diceBonus" type="number" value=0></input>
+                </div>
+                <div>
+                    <button id="rollButton">Roll</button>
+                </div>
+            </div>
+            <div id="historyWrapper"></div>
+        </div>
+    </div>
+
+    <script>
+        let diceHistory = [];
+
+        function RollDie(dieSize = 6) {
+            return Math.floor(Math.random() * parseInt(dieSize)) + 1;
+        }
+
+        function RollDice(dice = [1, 6], ob = false) {
+            var result = {
+                history: [],
+                sum: 0
+            };
+
+            for (let rolledDice = 0; rolledDice < dice[0]; rolledDice++) {
+                let dieResult = RollDie(dice[1]);
+                result.history.push(dieResult);
+
+                if (ob === true && dieResult === dice[1]) {
+                    rolledDice -= 2;
+                    continue;
+                }
+
+                result.sum += dieResult;
+            }
+
+            return result;
+        }
+
+        document.getElementById("rollButton").onclick = function() {
+
+            let numOfDice = document.getElementById("dice").value;
+            let diceBonus = document.getElementById("diceBonus").value;
+            let historyWrapper = document.getElementById("historyWrapper");
+            let resultWrapper = document.getElementById("resultWrapper");
+
+            result = RollDice([numOfDice, 6], true);
+
+            resultWrapper.textContent = result.sum + parseInt(diceBonus);
+            historyWrapper.textContent = `${result.history} + ${diceBonus}`;
+        };
+    </script>
+</body>
+
+</html>
